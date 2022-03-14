@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from __future__ import print_function
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash,abort
 from flaskext.mysql import MySQL
 from pip import main
 from datetime import datetime
@@ -10,7 +10,7 @@ from sklearn import model_selection
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 from googleplaces import GooglePlaces, types, lang 
-#from flask_socketio import SocketIO
+from flask_socketio import SocketIO
 import pandas as pd 
 import numpy as np
 import pickle
@@ -260,7 +260,24 @@ def home():
         return render_template('dashboard.html', account = account, num = records,isdoctor=session['isdoctor'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
-
+    # doctor dash bord
+@app.route('/doc_dash')
+def doc_dash():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        if(session['isdoctor']==0):
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+        else:
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
+        account = cursor.fetchone()
+        cursor1 = mysql.get_db().cursor()
+        records = cursor.execute('SELECT * FROM users')
+        return render_template('doc_dashbord.html', account = account, num = records,isdoctor=session['isdoctor'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
 #Patient Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -344,7 +361,10 @@ def register():
     # Show registration form with message (if any)
     flash(msg)
     return render_template('patientlogin.html', msg=msg)
-
+#forget password rest option
+@app.route('/reset', methods=['GET','POST'])
+def reset():
+    return render_template('forget.html')
 #Doctor Register
 @app.route('/docregister', methods=['GET', 'POST'])
 def docregister():
@@ -412,7 +432,7 @@ def doclogin():
             session['username'] = account[1]
             session['isdoctor'] = 1
             # Redirect to home page
-            return home()
+            return doc_dash()
         else:
             # Account doesnt exist or username/password incorrect
             msg = 'Incorrect username/password!'
@@ -439,7 +459,17 @@ def bmi():
             result=round(result,2)
         return render_template('bmi.html',ans=result,account=account,height=h,weight=w) 
     return redirect(url_for('login'))
-
+@app.route("/consultation")
+def consultation():
+    if 'loggedin' in session:
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+        account = cursor.fetchone()
+        return render_template('consultation.html', account=account)
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+  
+ 
 #Diagnose based on Symptoms First Step
 @app.route('/diagnose')
 def diagnose():
@@ -771,7 +801,7 @@ Code for the Chat App
 which is based on Sockets.io
 """
 
-# socketio = SocketIO(app)
+socketio = SocketIO(app)
 
 #Main Chat Interface
 @app.route('/chat')
@@ -783,10 +813,10 @@ def messageReceived(methods=['GET', 'POST']):
     print('message was received!!!')
 
 #Handles sending and receiving of Messages
-#@socketio.on('my event')
+@socketio.on('my event')
 def handle_my_custom_event(json, methods=['GET', 'POST']):
     print('received my event: ' + str(json))
-    #socketio.emit('my response', json, callback=messageReceived)
+    socketio.emit('my response', json, callback=messageReceived)
 
 
 # http://localhost:5000/logout - this will be the logout page
