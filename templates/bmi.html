@@ -33,7 +33,7 @@
             </li>
             
             <li>
-                <a href="{{ url_for('healthstatus') }}">
+                <a href="#">
                     <i class="metismenu-icon fa fa-home"></i>
                     Health Status
                 </a>
@@ -53,10 +53,18 @@
             </li>
 
             <li>
-                <a href="#">
-                    <i class="metismenu-icon fa fa-user">
-                    </i>Appointment
-                </a>
+                <div class="btn-group">
+                    <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        
+                        <i class="metismenu-icon fa fa-user">
+                        </i>Appointment
+                    </a>
+                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
+                        <a href="{{ url_for('book') }}" tabindex="0" class="dropdown-item">Book Appointment</a>
+                        <div tabindex="-1" class="dropdown-divider"></div>
+                        <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
+                    </div>
+                </div>
             </li>
              <li>
                 <a href="#">
@@ -78,7 +86,7 @@
                     <i class="fa fa-heartbeat icon-gradient bg-amy-crisp"> </i>
                 </div>
                 <div>Diagnose
-                    <div class="page-title-subheading">Calculate your BMI with PharmaCat.
+                    <div class="page-title-subheading">Calculate your BMI with ASTU E-Health.
                     </div>
                 </div>
             </div>

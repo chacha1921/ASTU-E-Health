@@ -52,10 +52,18 @@
             </li>
 
             <li>
-                <a href="#">
-                    <i class="metismenu-icon fa fa-user">
-                    </i>Appointment
-                </a>
+                <div class="btn-group">
+                    <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="mm-active">
+                        
+                        <i class="metismenu-icon fa fa-user">
+                        </i>Appointment
+                    </a>
+                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
+                        <a href="{{ url_for('book') }}" tabindex="0" class="dropdown-item" >Book Appointment</a>
+                        <div tabindex="-1" class="dropdown-divider"></div>
+                        <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
+                    </div>
+                </div>
             </li>
              <li>
                 <a href="#">
@@ -78,7 +86,7 @@
             </div>
             <div>Book Appointment
                 <div class="page-title-subheading">
-                    Select the Hospital where you want to book your appointment at.
+                    Select the Doctor who you want to book your appointment.
                 </div>
             </div>
         </div>
@@ -91,19 +99,42 @@
             <div class="col-lg-8">
                 
         <div class="main-card mb-3 card">
-                    <div class="card-body"><h5 class="card-title">Select your Hospital</h5>
+                    <div class="card-body"><h5 class="card-title">Select the Doctor</h5>
                         
                         <div class="tab-content">
                             <div class="tab-pane active" id="tab-eg11-0" role="tabpanel">
 
-                        <form class="" action="{{ url_for('book') }}" method="post">
+                        <form class="" action="{{ url_for('book') }}" method="POST">
                             
-                            <select class="mb-2 form-control" name="hname" required>
-                                {% for i in places: %}
-                                <option value="{{ i }}">{{ i }}</option>
+                            <select class="mb-2 form-control" name="fname" required>
+                                
+                                {% for i in appinfo %}
+                                <option value="{{ i[4] }}">{{ i[4] }}</option>
                                 {% endfor %}
                             </select>
-                            <input type="time" name="time" min="09:00" max="18:00" style="border:0px;padding: 20px;font-size:15px;" required>
+                            <br>
+                           
+                            <input type="date" id="datefield" name="date" placeholder="dd-mm-yyyy" value=""min="2013-01-01" max="2030-12-31">
+                            <script>
+                                var today = new Date();
+                                var dd = today.getDate();
+                                var mm = today.getMonth() + 1; //January is 0!
+                                var yyyy = today.getFullYear();
+
+                                if (dd < 10) {
+                                dd = '0' + dd;
+                                }
+
+                                if (mm < 10) {
+                                mm = '0' + mm;
+                                } 
+                                    
+                                today = yyyy + '-' + mm + '-' + dd;
+                                document.getElementById("datefield").setAttribute("min", today);
+                            </script>
+                            <br>
+                            <input type="time" name="time" min="02:00" max="12:00" style="border:0px;padding: 20px;font-size:15px;" required>
+                        
                             <br><br>
                             <button class="btn btn-primary">Proceed</button>
                         </form>

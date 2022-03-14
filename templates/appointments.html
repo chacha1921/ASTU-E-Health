@@ -144,7 +144,7 @@
                                 <li class="app-sidebar__heading">Dashboard</li>
                                 <li>
                                     <a href="{{ url_for('home') }}">
-                                        <i class="metismenu-icon fa fa-terminal"></i>
+                                        <i class="metismenu-icon fa fa-home"></i>
                                         Home
                                     </a>
                                 </li>
@@ -189,10 +189,18 @@
                                 </li>
                     
                                 <li>
-                                    <a href="#">
-                                        <i class="metismenu-icon fa fa-user">
-                                        </i>Appointment
-                                    </a>
+                                    <div class="btn-group">
+                                        <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="mm-active">
+                                            
+                                            <i class="metismenu-icon fa fa-user">
+                                            </i>Appointment
+                                        </a>
+                                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
+                                            <a href="{{ url_for('book') }}" tabindex="0" class="dropdown-item">Book Appointment</a>
+                                            <div tabindex="-1" class="dropdown-divider"></div>
+                                            <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
+                                        </div>
+                                    </div>
                                 </li>
                                  <li>
                                     <a href="#">
@@ -232,42 +240,35 @@
                                                 
                                                 <div class="tab-content">
                                                     <div class="tab-pane active" id="tab-eg11-0" role="tabpanel">
-                                            
-                                        
-                                            
-                                                     
-                                        
-                                            
-                 
-                                        <table class="mb-0 table table-striped">
-                                            <thead>
+                                                       
+                                         <table class="mb-0 table table-striped">
+                                           <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Hospital Address</th>
                                                 <th>Doctor Name</th>
+                                                <th>Address</th>
+                                                <th>Appointment Date</th>
                                                 <th>Appointment Time</th>
                                                 <th>Status</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {% for i in l %}
-                                            <tr>
-                                                <th scope="row">{{ loop.index }}</th>
-                                                <td>{{ arr[loop.index-1][1] }}</td>
-                                                <td>{{ arr[loop.index-1][0] }}</td>
-                                                <td>{{ i[3] }}</td>
-                                                {% if i[4]==0 %}
-                                                <td><div class="mb-2 mr-2 badge badge-dark">Pending</div></td>
-                                                {% else %}
-                                                <td><div class="mb-2 mr-2 badge badge-success">Approved</div></td>
-                                                {% endif %}
-                                            </tr>
-                                            {% endfor %}
-                                            </tbody>
+                                                {% for i in l %}
+                                                <tr>
+                                                    <th scope="row">{{ loop.index }}</th>
+                                                    <td>{{ arr[loop.index-1][0] }}</td>
+                                                    <td>{{ arr[loop.index-1][1] }}</td>
+                                                    <td>{{ i[3] }}</td>
+                                                    <td>{{ i[4] }}</td>
+                                                    {% if i[5]==0 %}
+                                                    <td><div class="mb-2 mr-2 badge badge-dark">Pending</div></td>
+                                                    {% else %}
+                                                    <td><div class="mb-2 mr-2 badge badge-success">Approved</div></td>
+                                                    {% endif %}
+                                                </tr>
+                                                {% endfor %}
+                                                </tbody>
                                         </table>
-                                            
-                                       
-                                                
                                                        
                                         
                                                     </div>
@@ -290,7 +291,7 @@
                                     <ul class="nav">
                                         <li class="nav-item">
                                             
-                                                &copy; 2019 PharmaCat is an educational instance.
+                                                &copy; 2022 ASTU E-Health is an educational instance.
                                             
                                         </li>
                                     </ul>

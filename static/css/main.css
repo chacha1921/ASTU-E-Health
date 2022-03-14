@@ -10679,6 +10679,20 @@ button,
 	transition: color 300ms
 }
 
+.btn-group i.metismenu-icon {
+	text-align: center;
+	width: 34px;
+	height: 34px;
+	line-height: 34px;
+	position: absolute;
+	left: 5px;
+	top: 50%;
+	margin-top: -17px;
+	font-size: 1.5rem;
+	opacity: .3;
+	transition: color 300ms
+}
+
 .vertical-nav-menu i.metismenu-state-icon {
 	transition: transform 300ms;
 	left: auto;
