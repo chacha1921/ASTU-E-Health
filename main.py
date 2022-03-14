@@ -1036,5 +1036,4 @@ def cancel_app(id):
 #run the Flask Server
 if __name__ == '__main__':
     app.run(debug=True)
-
 #"""-------------------------------End of Web Application-------------------------------"""
