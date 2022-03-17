@@ -251,16 +251,36 @@ def home():
         if(session['isdoctor']==0):
             cursor = mysql.get_db().cursor()
             cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+            account = cursor.fetchone()
+            cursor1 = mysql.get_db().cursor()
+            records = cursor.execute('SELECT * FROM users')
+            return render_template('dashboard.html', account = account, num = records,isdoctor=session['isdoctor'])
         else:
             cursor = mysql.get_db().cursor()
             cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
-        account = cursor.fetchone()
-        cursor1 = mysql.get_db().cursor()
-        records = cursor.execute('SELECT * FROM users')
-        return render_template('dashboard.html', account = account, num = records,isdoctor=session['isdoctor'])
+            account = cursor.fetchone()
+            cursor1 = mysql.get_db().cursor()
+            records = cursor.execute('SELECT * FROM doctors')
+            return render_template('doc_dashbord.html')
+        
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
     # doctor dash bord
+@app.route('/dochome')
+def dochome():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
+        account = cursor.fetchone()
+        cursor1 = mysql.get_db().cursor()
+        records = cursor.execute('SELECT * FROM doctors')
+        return render_template('doc_dashbord.html', account = account, num = records,isdoctor=session['isdoctor'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+    # doctor dash bord
+
 @app.route('/doc_dash')
 def doc_dash():
     # Check if user is loggedin
@@ -794,6 +814,65 @@ def appointments():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
+@app.route('/curappointment',methods=['GET', 'POST'])
+def curappointment():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
+        account = cursor.fetchone()
+        if(account is None):
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+            account = cursor.fetchone()
+            address = account[5]
+        else:
+            address = account[9]
+            
+        cursor2 = mysql.get_db().cursor()    
+        cursor2.execute('SELECT * FROM booking WHERE Doctor_ID= %s', [session['id']])
+        l = cursor2.fetchall()
+        arr = []
+        for i in l:
+            cursor3 = mysql.get_db().cursor()    
+            cursor3.execute('SELECT * FROM users WHERE ID= %s', [i[2]])
+            doc = cursor3.fetchone()
+            arr.append([doc[4],doc[5]])
+            
+        return render_template('viewappointments.html', account=account,l=l,arr=arr)
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+@app.route('/cancel_app/<string:id>', methods=['POST'])
+def cancel_app(id):
+    #create cursor
+    cur = mysql.get_db().cursor()
+    cur.execute("DELETE FROM booking WHERE Record_ID = %s", [id])
+    mysql.get_db().commit()
+    cur.close()
+    #flash('Appointment is canceled', 'success')
+    return redirect(url_for('curappointment'))
+
+@app.route('/approve_app/<string:id>', methods=['POST'])
+def approve_app(id):
+    #create cursor
+    cur = mysql.get_db().cursor()
+    cur.execute("UPDATE booking SET Status=1 WHERE Record_ID = %s", [id])
+    mysql.get_db().commit()
+    cur.close()
+    #flash('Appointment is canceled', 'success')
+    return redirect(url_for('curappointment'))
+
+@app.route('/cancelp_app/<string:id>', methods=['POST'])
+def cancelp_app(id):
+    #create cursor
+    cur = mysql.get_db().cursor()
+    cur.execute("DELETE FROM booking WHERE Record_ID = %s", [id])
+    mysql.get_db().commit()
+    cur.close()
+    #flash('Appointment is canceled', 'success')
+    return redirect(url_for('appointments'))
 
 
 """
@@ -828,210 +907,6 @@ def logout():
    session.pop('username', None)
    # Redirect to login page
    return redirect(url_for('login'))
-
-
-
-
-#appointment for personal user
-#@app.route('/')
-##def index():
-#    return render_template('home.html')
-
-@app.route('/instruction')
-def instruction():
-    return render_template('instruction.html')
-
-#@app.route('/doctors')
-#def doctor():
-#    return render_template('doctors.html', doctors = doc)
-
-class RegisterForm(Form):
-    name = StringField('Name', [validators.Length(min=4, max=50)])
-    doc_id = StringField('Doc_id', [validators.Length(min=1, max=50)])
-    address = StringField('Address', [validators.Length(min=5, max=50)])
-    address2 = StringField('Address2', [validators.Length(min=5, max=50)])
-
-
-@app.route('/cudoc', methods=['GET', 'POST'])
-def cudoc():
-    cur = mysql.get_db().cursor()
-
-    result = cur.execute("SELECT * FROM docinfo")
-    docinfo = cur.fetchall()
-
-    if result > 0:
-        return render_template('cudoc.html', docinfo=docinfo)
-    else:
-        msg = 'No Doctor Information'
-        return render_template('cudoc.html', msg=msg)
-    cur.close()
-
-#Delete doctor info
-@app.route('/delete_docinfo/<string:id>', methods=['POST'])
-def delete_docinfo(id):
-    #create cursor
-    cur = mysql.get_db().cursor()
-    cur.execute("DELETE FROM docinfo WHERE docid = %s", [id])
-    cur.execute("DELETE FROM avapp WHERE docid = %s", [id])
-    cur.execute("DELETE FROM boapp WHERE docid = %s", [id])
-    cur.execute("DELETE FROM unavapp WHERE docid = %s", [id])
-    mysql.get_db().commit()
-    cur.close()
-
-    flash('Doctor Deleted', 'success')
-    return redirect(url_for('cudoc'))
-
-
-
-@app.route('/input', methods=['GET', 'POST'])
-def input():
-    msg=''
-    form = RegisterForm(request.form)
-    if request.method == 'POST' and form.validate():
-        name = form.name.data
-        doc_id = form.doc_id.data
-        doc_id1 = int(doc_id) + 1
-        address = form.address.data
-        address2 = form.address2.data
-
-        #create cursor
-        cur = mysql.get_db().cursor()
-        #execute
-        cur.execute("INSERT INTO docinfo(name, docid, address, address2) VALUES(%s, %s, %s, %s)", (name, doc_id, address, address2))
-
-        #create availabe appointment
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'MON morning')", (name, doc_id, address, int(doc_id) + 2))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'MON morning')", (name, doc_id, address2, int(doc_id) + 2))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'MON afternoon')", (name, doc_id, address, int(doc_id) + 4))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'MON afternoon')", (name, doc_id, address2, int(doc_id) + 4))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'TUE morning')", (name, doc_id, address, int(doc_id) + 6))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'TUE morning')", (name, doc_id, address2, int(doc_id) + 6))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'TUE afternoon')", (name, doc_id, address, int(doc_id) + 8))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'TUE afternoon')", (name, doc_id, address2, int(doc_id) + 8))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'WED morning')", (name, doc_id, address, int(doc_id) + 10))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'WED morning')", (name, doc_id, address2, int(doc_id) + 10))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'WED afternoon')", (name, doc_id, address, int(doc_id) + 12))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'WED afternoon')", (name, doc_id, address2, int(doc_id) + 12))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'THR morning')", (name, doc_id, address, int(doc_id) + 14))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'THR morning')", (name, doc_id, address2, int(doc_id) + 14))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'THR afternoon')", (name, doc_id, address, int(doc_id) + 16))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'THR afternoon')", (name, doc_id, address2, int(doc_id) + 16))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'FRI morning')", (name, doc_id, address, int(doc_id) + 18))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'FRI morning')", (name, doc_id, address2, int(doc_id) + 18))
-
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'FRI afternoon')", (name, doc_id, address, int(doc_id) + 20))
-        cur.execute("INSERT INTO avapp(name, docid, address, dateid, date) VALUES(%s, %s, %s, %s, 'FRI afternoon')", (name, doc_id, address2, int(doc_id) + 20))
-
-        #commit to DB
-        mysql.get_db().commit()
-        cur.close()
-        msg='Input successful', 'success'
-        flash(msg)
-        return render_template('instruction.html')
-        #redirect(url_for('instruction'))
-    return render_template('input.html', form=form)
-
-
-@app.route('/makeapp', methods=['GET', 'POST'])
-def makeapp():
-    if 'loggedin' in session:
-            
-            cursor = mysql.get_db().cursor()
-            cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
-            account = cursor.fetchone()
-            if(account is None):
-                cursor = mysql.get_db().cursor()
-                cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
-                account = cursor.fetchone()
-                address = account[9]
-            else:
-                address = account[5]
-                
-            cursor2 = mysql.get_db().cursor()    
-            cursor2.execute('SELECT * FROM booking WHERE Patient_ID= %s', [session['id']])
-            l = cursor2.fetchall()
-            arr = []
-            for i in l:
-                cursor3 = mysql.get_db().cursor()    
-                cursor3.execute('SELECT * FROM doctors WHERE ID= %s', [i[1]])
-                doc = cursor3.fetchone()
-                arr.append([doc[1],doc[9]])
-                
-            return render_template('appointments.html', account=account,l=l,arr=arr)
-        # User is not loggedin redirect to login page
-        
-
- #       cur = mysql.get_db().cursor()
-
-  #      result = cur.execute("SELECT * FROM doctors")
-  #      appinfo = cur.fetchall()
-
-  #      if result > 0:
-  #          return render_template('appointments.html', appinfo=appinfo)
-  #      else:
-  #          msg = 'No Available Appointment'
-   #         return render_template('appointments.html', msg=msg)
-   #     cur.close()
-    return redirect(url_for('login'))
-
-@app.route('/book_app/<string:id>', methods=['POST'])
-def book_app(id):
-    #create cursor
-    cur = mysql.get_db().cursor()
-    resultaa = cur.execute("SELECT dateid FROM avapp WHERE id = %s", [id])
-    aaaa = cur.fetchall()
-    #print ('%s', aaaa[0][1])
-    cur.execute("INSERT INTO booking(name, docid, dateid, date, address) SELECT Full_Name, ID, Specialization, Username, Address FROM doctors WHERE ID = %s", [id] )
-    #cur.execute("DELETE FROM avapp WHERE id = %s", [id])
-    cur.execute("INSERT INTO unavapp(name, docid, dateid, date, address) SELECT Full_Name, ID, Specialization, Username, Address FROM doctors WHERE id = %s", [id] )
-    #cur.execute("DELETE FROM avapp WHERE dateid = %s", aaaa[0][0])
-    # cur.execute("DELETE FROM avapp WHERE id = %s", [id])
-    mysql.get_db().commit()
-    cur.close()
-    flash('Appointment is made', 'success')
-    return redirect(url_for('makeapp'))
-
-
-@app.route('/curapp', methods=['GET', 'POST'])
-def curapp():
-    cur = mysql.get_db().cursor()
-    result = cur.execute("SELECT * FROM boapp")
-    appinfo = cur.fetchall()
-
-    if result > 0:
-        return render_template('curapp.html', appinfo=appinfo)
-    else:
-        msg = 'No Current Appointment'
-        return render_template('curapp.html', msg=msg)
-    cur.close()
-
-
-@app.route('/cancel_app/<string:id>', methods=['POST'])
-def cancel_app(id):
-    #create cursor
-    cur = mysql.get_db().cursor()
-    resultbb = cur.execute("SELECT dateid FROM boapp WHERE id = %s", [id])
-    bbbb = cur.fetchall()
-    cur.execute("INSERT INTO avapp(name, docid, dateid, date, address) SELECT name, docid, dateid, date, address FROM boapp WHERE id = %s", [id] )
-    cur.execute("DELETE FROM boapp WHERE id = %s", [id])
-    cur.execute("INSERT INTO avapp(name, docid, dateid, date, address) SELECT name, docid, dateid, date, address FROM unavapp WHERE dateid = '%s'", bbbb[0][0] )
-    cur.execute("DELETE FROM unavapp WHERE dateid = %s", bbbb[0][0])
-    mysql.get_db().commit()
-    cur.close()
-    flash('Appointment is canceled', 'success')
-    return redirect(url_for('curapp'))
-
-
-
-
 
 #run the Flask Server
 if __name__ == '__main__':

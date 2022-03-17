@@ -138,81 +138,43 @@
                                 </span>
                             </button>
                         </span>
-                    </div>    <div class="scrollbar-sidebar">
-                        <div class="app-sidebar__inner">
-                            <ul class="vertical-nav-menu">
-                                <li class="app-sidebar__heading">Dashboard</li>
-                                <li>
-                                    <a href="{{ url_for('home') }}">
-                                        <i class="metismenu-icon fa fa-home"></i>
-                                        Home
-                                    </a>
-                                </li>
-                                
-                                <li>
-                                    <a href="{{ url_for('bmi') }}">
-                                        <i class="metismenu-icon fa fa-user">
-                                        </i>BMI
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url_for('diagnose') }}" >
-                                        <i class="metismenu-icon fa fa-plus-circle">
-                                        </i>Diagnose(Symptoms)
-                                    </a>
-                                </li>
-                                
-                                <li>
-                                    <a href="{{ url_for('diagnosedetails') }}">
-                                        <i class="metismenu-icon fa fa-plus-square">
-                                        </i>Diagnose(Text)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url_for('healthstatus') }}">
-                                        <i class="metismenu-icon fa fa-home"></i>
-                                        Health Status
-                                    </a>
-                                </li>
-                                
-                                <li>
-                                    <a href="#">
-                                        <i class="metismenu-icon fa fa-user">
-                                        </i>View Recommendation
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" >
-                                        <i class="metismenu-icon fa fa-plus-circle">
-                                        </i>Consultancy
-                                    </a>
-                                </li>
-                    
-                                <li>
-                                    <div class="btn-group">
-                                        <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="mm-active">
-                                            
-                                            <i class="metismenu-icon fa fa-user">
-                                            </i>Appointment
-                                        </a>
-                                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
-                                            <a href="{{ url_for('book') }}" tabindex="0" class="dropdown-item">Book Appointment</a>
-                                            <div tabindex="-1" class="dropdown-divider"></div>
-                                            <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
-                                        </div>
-                                    </div>
-                                </li>
-                                 <li>
-                                    <a href="#">
-                                        <i class="metismenu-icon fa fa-rocket">
-                                        </i>Hospitals
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                    </div>    
+                  <!--  <div class="scrollbar-sidebar">-->
+                    <div class="app-sidebar__inner">
+                        <ul class="vertical-nav-menu">
+                            <li class="app-sidebar__heading">Dashboard</li>
+                            <li>
+                                <a href="{{ url_for('doc_dash') }}" class="mm-active">
+                                    <i class="metismenu-icon fa fa-home"></i> Home
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="metismenu-icon fa fa-home"></i> View Sensor Data
+                                </a>
+                            </li>
+                
+                            <li>
+                                <a href="#">
+                                    <i class="metismenu-icon fa fa-user">
+                                    </i>Send Recommendation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="metismenu-icon fa fa-plus-circle">
+                                    </i>Consultion
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('curappointment') }}">
+                                    <i class="metismenu-icon fa fa-plus-circle">
+                                    </i>Appointment
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </div>    
-                <div class="app-main__outer">
+                </div>   <div class="app-main__outer">
 
                     
                     <div class="app-main__inner">
@@ -245,12 +207,14 @@
                                            <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Doctor Name</th>
+                                                <th>Personal User Name</th>
                                                 <th>Address</th>
                                                 <th>Appointment Date</th>
                                                 <th>Appointment Time</th>
                                                 <th>Status</th>
                                                 <th>Cancel Appointment</th>
+                                                <th>Approve Appointment</th>
+                                                
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -262,15 +226,22 @@
                                                     <td>{{ i[3] }}</td>
                                                     <td>{{ i[4] }}</td>
                                                     {% if i[5]==0 %}
-                                                    <td><div class="mb-2 mr-2 badge badge-dark">Pending</div></td>
-                                                    <td><form action="{{url_for('cancelp_app', id=i[0])}}" method="post">
+                                                    <td> <div class="mb-2 mr-2 badge badge-dark">Pending</div></td>
+                                                    
+                                                    <td><form action="{{url_for('cancel_app', id=i[0])}}" method="post">
                                                         <input type="submit" value="Cancel Appointment" class="btn btn-danger">
+                                                      </form></td>
+                                                    <td><form action="{{url_for('approve_app', id=i[0])}}" method="post">
+                                                        <input type="submit" value="Aprove Appointment" class="btn btn-danger">
                                                       </form></td>
                                                     {% else %}
-                                                    <td><div class="mb-2 mr-2 badge badge-success">Approved</div></td>
-                                                    <td><form action="{{url_for('cancelp_app', id=i[0])}}" method="post">
-                                                        <input type="submit" value="Cancel Appointment" class="btn btn-danger">
-                                                      </form></td>
+                                                    <td><div class="mb-2 mr-2 badge badge-success">Approved</div>
+                                                        </td>
+                                                    <td>
+                                                        <form action="{{url_for('cancel_app', id=i[0])}}" method="post">
+                                                            <input type="submit" value="Cancel Appointment" class="btn btn-danger">
+                                                          </form>
+                                                        </td>
                                                     {% endif %}
                                                 </tr>
                                                 {% endfor %}
