@@ -1,0 +1,160 @@
+{% extends 'dashboardExtender.html' %}
+
+{% block sidebar %}
+<div class="scrollbar-sidebar">
+    <div class="app-sidebar__inner">
+        <ul class="vertical-nav-menu">
+            <li class="app-sidebar__heading">Dashboard</li>
+            <li>
+                <a href="{{ url_for('home') }}" class="mm-active">
+                    <i class="metismenu-icon fa fa-home"></i>
+                    Home
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('bmi') }}">
+                    <i class="metismenu-icon fa fa-user">
+                    </i>BMI
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('diagnose') }}">
+                    <i class="metismenu-icon fa fa-plus-circle">
+                    </i>Diagnose(Symptoms)
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('diagnosedetails') }}">
+                    <i class="metismenu-icon fa fa-plus-square">
+                    </i>Diagnose(Text)
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('healthstatus') }}">
+                    <i class="metismenu-icon fa fa-home"></i>
+                    Health Status
+                </a>
+            </li>
+            
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-user">
+                    </i>View Recommendation
+                </a>
+            </li>
+            <li>
+                <a href="/chattingh/{{ session['id'] }}">
+                    <i class="metismenu-icon fa fa-plus-circle">
+                    </i>Consultancy
+                </a>
+            </li>
+
+            <li>
+                <div class="btn-group">
+                    <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        
+                        <i class="metismenu-icon fa fa-user">
+                        </i>Appointment
+                    </a>
+                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
+                        <a href="{{ url_for('book') }}" tabindex="0" class="dropdown-item">Book Appointment</a>
+                        <div tabindex="-1" class="dropdown-divider"></div>
+                        <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
+                    </div>
+                </div>
+            </li>
+             <li>
+                <a href="{{ url_for('hospitals') }}">
+                    <i class="metismenu-icon fa fa-rocket">
+                    </i>Hospitals
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<script>
+    function ajax(){
+
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function(){
+    if(req.readyState == 4 && req.status == 200)
+    {
+    document.getElementById('chats').innerHTML = req.responseText;
+    }
+    }
+    req.open('POST', '/chats', true);
+    req.send();
+    }
+    setInterval(function(){ajax()}, 10);
+</script>
+<div class="app-main__inner">
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon">
+                    <i class="fa fa-file-text icon-gradient bg-amy-crisp"> </i>
+                </div>
+                <div>Consultancy
+                    <div class="page-title-subheading">Chat With Doctors
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" onload="ajax();">
+        <div class="col-lg-4" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
+            <div style="text-align: center;font-size: 18px;background-color: #ddd;border-radius: 4px;color: #5e5fa4;margin-bottom: 8px;">
+                <span>Users Chart</span>
+            </div>
+            <ul class="list-group">
+                {% for user in users %}
+                        <li class="list-group-item"><a href="/chatting/{{ user[0] }}"> {{user[4]}} </a>
+                            {% if user[10] != 0 %}
+                                <span style="height: 12px;width: 12px;background-color: #1fc124;border-radius: 6px;
+                                float: right;margin-top: 5px;"></span>
+                            {% else %}
+                                <span style="height: 12px;width: 12px;background-color: #8a8a8a;border-radius: 6px;
+                                float: right;margin-top: 5px;"></span>
+                            {% endif %}
+                        </li>
+                   
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-lg-6" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
+
+            {% if session['lid'] %}
+                {% if session['name'] != session['full_name'] %}
+                    <div style="text-align: center;font-size: 18px; color: #22aa45;background-color: #ddd;border-radius: 4px;">
+                        <span>{{ session['name'] }}</span>
+                    </div>
+                    <div id="chat-box" style="overflow-y: scroll; height: 350px; padding: 10px 0px 0px 0px;">
+                        <div id="chats"></div>
+                    </div>
+                    {% from "includes/_formhelpers.html" import render_field %}
+                    <div>
+                        <form method="POST" action="">
+                        <div class="form-group">
+                            {{render_field(form.body, class_="form-control", value="", placeholder="Enter your text...")}}
+                        </div>
+                        <button type="submit" class="btn btn-primary pull-right">Send</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div style="text-align: center;">
+                        <h1>Welcome to Chat Room</h1>
+                        <p class="lead">Select users and start chat...</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+        <div class="col-xs-1"></div>
+    </div>
+</div>
+{% endblock %}

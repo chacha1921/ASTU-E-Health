@@ -46,7 +46,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" >
+                <a href="/chattingh/{{ session['id'] }}">
                     <i class="metismenu-icon fa fa-plus-circle">
                     </i>Consultancy
                 </a>
@@ -118,8 +118,8 @@
                                     <br><br>
                                     
                                     <h5 class="card-title">Not Happy with the response? </h5>
-                                    <a href="#" target = "_blank" class="mb-2 mr-2 btn btn-primary" style="color:white;">Live Chat with a Doctor<span class="badge badge-light">BETA</span></a>
-                                    <a href="#" class="mb-2 mr-2 btn btn-secondary" style="color:white;">Make an Appointment</a>
+                                    <a href="{https://chat-service-raj.herokuapp.com/chat.html?username={{account[1]}}&room={{account[0]}}}" target = "_blank" class="mb-2 mr-2 btn btn-primary" style="color:white;">Live Chat with a Doctor<span class="badge badge-light">BETA</span></a>
+                                    <a href="{{ url_for('book') }}" class="mb-2 mr-2 btn btn-secondary" style="color:white;">Make an Appointment</a>
                                 </div>
                                 
                             </div>
