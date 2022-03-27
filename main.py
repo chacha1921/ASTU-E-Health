@@ -1,9 +1,13 @@
 from __future__ import unicode_literals
 from __future__ import print_function
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash,abort
+from distutils.log import debug
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash,abort, logging
 from flaskext.mysql import MySQL
+from functools import wraps
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
 from pip import main
-from datetime import datetime
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from sklearn import tree 
 from sklearn import model_selection
@@ -21,8 +25,13 @@ import hashlib
 import bcrypt
 import json
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 import nltk
 import pybase64
+from datetime import date
+from sklearn.preprocessing import normalize
+from wtforms.fields.html5 import EmailField
 
 
 app = Flask(__name__)
@@ -261,7 +270,7 @@ def home():
             account = cursor.fetchone()
             cursor1 = mysql.get_db().cursor()
             records = cursor.execute('SELECT * FROM doctors')
-            return render_template('doc_dashbord.html')
+            return render_template('doc_dashbord.html', account = account)
         
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
@@ -320,8 +329,11 @@ def login():
             session['loggedin'] = True
             session['id'] = account[0]
             session['username'] = account[1]
+            session['full_name']=account[4]
             session['api'] = account[8]
             session['isdoctor'] = 0
+            x= '1'
+            cursor.execute("UPDATE users SET online=%s WHERE ID=%s", (x, account[0]))
             # Redirect to dashboard
            
             return home()
@@ -373,7 +385,7 @@ def register():
             #print(r.decode('utf-8'))
             
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s)', (username, hashed_password, email, full_name, address, blood, age, api))
+            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s,%s)', (username, hashed_password, email, full_name, address, blood, age, api,0))
             msg = 'You have successfully registered!'
     elif request.method == 'POST':
         # Form is empty... (no POST data)
@@ -419,7 +431,7 @@ def docregister():
             # Account doesnt exists and the form data is valid, now insert new account into users table
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             print(username + "\n" + str(hashed_password)+ "\n" + email+ "\n" +full_name+ "\n" +registration_number+ "\n" +contact_number+ "\n" +spec+ "\n" +address)
-            cursor.execute('INSERT INTO doctors VALUES (NULL, %s, %s, %s, %s, %s, %s ,%s, %s, %s)', ( username, hashed_password, email, full_name, registration_number, contact_number, "" , spec, address ))
+            cursor.execute('INSERT INTO doctors VALUES (NULL, %s, %s, %s, %s, %s, %s ,%s, %s, %s, %s)', ( username, hashed_password, email, full_name, registration_number, contact_number, "" , spec, address ,0))
             msg = 'You have successfully registered!'
     elif request.method == 'POST':
         # Form is empty... (no POST data)
@@ -445,12 +457,16 @@ def doclogin():
         account = cursor.fetchone()
         # If account exists in accounts table in out database
         # if account:
+        
         if bcrypt.checkpw(password.encode('utf-8'), account[2].encode('utf-8')):
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
             session['id'] = account[0]
             session['username'] = account[1]
+            session['full_name']= account[4]
             session['isdoctor'] = 1
+            x = '1'
+            cursor.execute("UPDATE doctors SET online=%s WHERE ID=%s", (x, account[0]))
             # Redirect to home page
             return doc_dash()
         else:
@@ -596,7 +612,7 @@ def diagnosefinal():
                 if (m!=0):
                     print("\n\n")
                     print(m)
-                    print("\n\n")
+                    #print("\n\n")
                     sample_x = [i/m if i ==m else i*0 for i in range(len(features))]
                     X[m] = 1
                 
@@ -672,7 +688,7 @@ def hospitals():
         else:
             address = account[5]
         # enter your api key here 
-        API_KEY = 'Enter your key'
+        API_KEY = 'AIzaSyCn8Lj3fta07gTzYzRSPQ0NjLaB059TyOE'
         str1 = str(address).split(",")
         l=""
         for i in range(0,len(str1)):
@@ -874,39 +890,232 @@ def cancelp_app(id):
     #flash('Appointment is canceled', 'success')
     return redirect(url_for('appointments'))
 
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, *kwargs)
+        else:
+            flash('Unauthorized, Please logged in', 'danger')
+            return redirect(url_for('login'))
+    return wrap
 
-"""
-Code for the Chat App
-which is based on Sockets.io
-"""
 
-socketio = SocketIO(app)
+def not_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            flash('Unauthorized, You logged in', 'danger')
+            return redirect(url_for('index'))
+        else:
+            return f(*args, *kwargs)
+    return wrap
 
-#Main Chat Interface
-@app.route('/chat')
-def sessions():
-    return render_template('chat.html')
 
-#Log Success of Messages
-def messageReceived(methods=['GET', 'POST']):
-    print('message was received!!!')
 
-#Handles sending and receiving of Messages
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['GET', 'POST']):
-    print('received my event: ' + str(json))
-    socketio.emit('my response', json, callback=messageReceived)
+class MessageForm(Form):    # Create Message Form
+    body = StringField('', [validators.length(min=1)], render_kw={'autofocus': True})
 
+@app.route('/chatting/<string:id>', methods=['GET', 'POST'])
+def chatting(id):
+    if 'loggedin' in session:
+        
+        form = MessageForm(request.form)
+        # Create cursor
+        cur = mysql.get_db().cursor()
+
+        # lid name
+        get_result = cur.execute("SELECT * FROM doctors WHERE ID=%s", [id])
+        l_data = cur.fetchone()
+        if get_result > 0:
+            session['name'] = l_data[4]
+            uid = session['id']
+            session['lid'] = id
+
+            if request.method == 'POST' and form.validate():
+                txt_body = form.body.data
+                # Create cursor
+                cur = mysql.get_db().cursor()
+                cur.execute("INSERT INTO messages(body, msg_by, msg_to) VALUES(%s, %s, %s)",
+                            (txt_body, session['full_name'], session['name']))
+                # Commit cursor
+                mysql.get_db().commit()
+
+            # Get users
+            cur.execute("SELECT * FROM doctors")
+            users = cur.fetchall()
+
+            # Close Connection
+            cur.close()
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+            account = cursor.fetchone()
+            return render_template('chat_room.html', users=users, form=form, account=account)
+        else:
+            flash('No permission!', 'danger')
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/chattingh/<string:id>', methods=['GET', 'POST'])
+def chattingh(id):
+    if 'loggedin' in session:
+        
+        form = MessageForm(request.form)
+        # Create cursor
+        cur = mysql.get_db().cursor()
+
+        # lid name
+        get_result = cur.execute("SELECT * FROM users WHERE ID=%s", [id])
+        l_data = cur.fetchone()
+        if get_result > 0:
+            session['name'] = l_data[4]
+            uid = session['id']
+            session['lid'] = id
+
+            if request.method == 'POST' and form.validate():
+                txt_body = form.body.data
+                # Create cursor
+                cur = mysql.get_db().cursor()
+                cur.execute("INSERT INTO messages(body, msg_by, msg_to) VALUES(%s, %s, %s)",
+                            (txt_body, uid, id))
+                # Commit cursor
+                mysql.get_db().commit()
+
+            # Get users
+            cur.execute("SELECT * FROM doctors")
+            users = cur.fetchall()
+
+            # Close Connection
+            cur.close()
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+            account = cursor.fetchone()
+            return render_template('chat_roomhome.html', users=users, form=form, account=account)
+        else:
+            flash('No permission!', 'danger')
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/chats', methods=['GET', 'POST'])
+def chats():
+    if 'loggedin' in session:
+        id = session['name']
+        uid = session['full_name']
+        # Create cursor
+        cur = mysql.get_db().cursor()
+        # Get message here
+        cur.execute("SELECT * FROM messages WHERE (msg_by=%s AND msg_to=%s) OR (msg_by=%s AND msg_to=%s) "
+                    "ORDER BY id ASC", (uid, id, id, uid))
+        chats = cur.fetchall()
+        # Close Connection
+        cur.close()
+        return render_template('chats.html', chats=chats,)
+    return redirect(url_for('login'))
+
+
+@app.route('/docchatting/<string:id>', methods=['GET', 'POST'])
+def docchatting(id):
+    if 'loggedin' in session:
+        
+        form = MessageForm(request.form)
+        # Create cursor
+        cur = mysql.get_db().cursor()
+
+        # lid name
+        get_result = cur.execute("SELECT * FROM users WHERE ID=%s", [id])
+        l_data = cur.fetchone()
+        if get_result > 0:
+            session['name'] = l_data[4]
+            uid = session['id']
+            session['lid'] = id
+
+            if request.method == 'POST' and form.validate():
+                txt_body = form.body.data
+                # Create cursor
+                cur = mysql.get_db().cursor()
+                cur.execute("INSERT INTO messages(body, msg_by, msg_to) VALUES(%s, %s, %s)",
+                            (txt_body, session['full_name'], session['name']))
+                # Commit cursor
+                mysql.get_db().commit()
+
+            # Get users
+            cur.execute("SELECT * FROM users")
+            users = cur.fetchall()
+
+            # Close Connection
+            cur.close()
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
+            account = cursor.fetchone()
+            return render_template('docchat_room.html', users=users, form=form, account=account)
+        else:
+            flash('No permission!', 'danger')
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/docchattingh/<string:id>', methods=['GET', 'POST'])
+def docchattingh(id):
+    if 'loggedin' in session:
+        
+        form = MessageForm(request.form)
+        # Create cursor
+        cur = mysql.get_db().cursor()
+
+        # lid name
+        get_result = cur.execute("SELECT * FROM doctors WHERE ID=%s", [id])
+        l_data = cur.fetchone()
+        if get_result > 0:
+            session['name'] = l_data[4]
+            uid = session['id']
+            session['lid'] = id
+
+            if request.method == 'POST' and form.validate():
+                txt_body = form.body.data
+                # Create cursor
+                cur = mysql.get_db().cursor()
+                cur.execute("INSERT INTO messages(body, msg_by, msg_to) VALUES(%s, %s, %s)",
+                            (txt_body, uid, id))
+                # Commit cursor
+                mysql.get_db().commit()
+
+            # Get users
+            cur.execute("SELECT * FROM users")
+            users = cur.fetchall()
+
+            # Close Connection
+            cur.close()
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM doctors WHERE ID = %s', [session['id']])
+            account = cursor.fetchone()
+            return render_template('docchat_roomhome.html', users=users, form=form, account=account)
+        else:
+            flash('No permission!', 'danger')
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
 
 # http://localhost:5000/logout - this will be the logout page
 @app.route('/logout')
 def logout():
    # Remove session data, this will log the user out
+   cur = mysql.get_db().cursor()
+   x = '0'
+   uid=session['id']
+   if(session['isdoctor']==0):
+       cur.execute("UPDATE users SET online=%s WHERE id=%s", (x, uid))
+   else:
+       cur.execute("UPDATE doctors SET online=%s WHERE id=%s", (x, uid))
    session.pop('loggedin', None)
    session.pop('id', None)
    session.pop('username', None)
+   session.clear()
    # Redirect to login page
-   return redirect(url_for('login'))
+   return redirect(url_for('index'))
 
 #run the Flask Server
 if __name__ == '__main__':

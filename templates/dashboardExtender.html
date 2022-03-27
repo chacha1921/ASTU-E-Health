@@ -10,8 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="description" content="A revolutionary online cross-platform health application.">
     <meta name="msapplication-tap-highlight" content="no">
-<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
-<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
 <body>
@@ -215,5 +217,10 @@
     </div>
     {% block script%}
     {% endblock%}
-<script type="text/javascript" src="{{ url_for('static', filename='assets/scripts/main.js') }}"></script></body>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script>
+    <script src="//cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
+    <script type="text/javascript">
+        CKEDITOR.replace('editor')
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/scripts/main.js') }}"></script></body>
 </html>
