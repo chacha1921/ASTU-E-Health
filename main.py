@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 from distutils.log import debug
+from unittest import result
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash,abort, logging
 from flaskext.mysql import MySQL
 from functools import wraps
@@ -32,12 +33,16 @@ import pybase64
 from datetime import date
 from sklearn.preprocessing import normalize
 from wtforms.fields.html5 import EmailField
-
+from module.database import Database
+import uuid
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
 port = int(os.environ.get('PORT', 5000))
+db = Database()
 
+mail = Mail(app)
 
 # Change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = 'canada$God7972#'
@@ -47,6 +52,13 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD	'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'pharmacat'
+
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'chalielijalem@gmail.com'
+app.config['MAIL_PASSWORD'] = 'chalie564881@19'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
 # Intialize MySQL
 mysql = MySQL(autocommit=True)
@@ -308,6 +320,24 @@ def doc_dash():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 #Patient Login
+
+@app.route('/admin_dash')
+def admin_dash():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        if(session['isadmin']==0):
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM users WHERE ID = %s', [session['id']])
+        else:
+            cursor = mysql.get_db().cursor()
+            cursor.execute('SELECT * FROM admin WHERE ID = %s', [session['id']])
+        account = cursor.fetchone()
+        cursor = mysql.get_db().cursor()
+        records = cursor.execute('SELECT * FROM users')
+        return render_template('admin_dashboard.html', account = account, num = records,isadmin=session['isadmin'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('adminlogin'))
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
@@ -476,6 +506,81 @@ def doclogin():
     flash(msg)
     return render_template('doctorlogin.html', msg=msg)
 
+#admin page 
+@app.route('/adminregister', methods=['GET', 'POST'])
+def adminregister():
+    # Output message if something goes wrong...
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        full_name = request.form['full_name']
+        registration_number = request.form['registration_number']
+        contact_number = request.form['contact_number']
+        #spec = request.form['specialization']
+        address = request.form['address']
+
+        # Check if account exists using MySQL
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM admin WHERE Username = %s', (username))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into users table
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            print(username + "\n" + str(hashed_password)+ "\n" + email+ "\n" +full_name+ "\n" +registration_number+ "\n" +contact_number+ "\n" +address)
+            cursor.execute('INSERT INTO admin VALUES (NULL, %s, %s, %s, %s, %s,%s, %s)', ( username, hashed_password, email, full_name, registration_number, contact_number, address ))
+            msg = 'You have successfully registered!'
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+    # Show registration form with message (if any)
+    flash(msg)
+    return render_template('adminlogin.html', msg=msg)
+
+#admin login page 
+@app.route('/adminlogin', methods=['GET', 'POST'])
+def adminlogin():
+    # Output message if something goes wrong...
+    msg = ''
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+        # Check if account exists using MySQL
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM admin WHERE Username = %s', (username))
+        # Fetch one record and return result
+        account = cursor.fetchone()
+        # If account exists in accounts table in out database
+        # if account:
+        if bcrypt.checkpw(password.encode('utf-8'), account[2].encode('utf-8')):
+            # Create session data, we can access this data in other routes
+            session['loggedin'] = True
+            session['id'] = account[0]
+            session['username'] = account[1]
+            session['isadmin'] = 1
+            # Redirect to home page
+            return admin_dash()
+        else:
+            # Account doesnt exist or username/password incorrect
+            msg = 'Incorrect username/password!'
+    # Show the login form with message (if any)
+    flash(msg)
+    return render_template('adminlogin.html', msg=msg)
+    
 #BMI for the dashboard(Written by Mayank)
 @app.route('/bmi',methods=['GET', 'POST'])
 def bmi():
@@ -1098,6 +1203,348 @@ def docchattingh(id):
             return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
+
+#ADMin functions 
+@app.route('/viewuser')
+def view():
+   # data = db.read(None)
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM users')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+
+    return render_template('view.html', data = data,account=account)
+@app.route('/viewdoctor')
+def viewdoctor():
+   # data = db.read(None)
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM doctors')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+
+    return render_template('viewdoc.html', data = data,account=account)
+@app.route('/add/')
+def add():
+    #data=db.insert(request.form)
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM users')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    return render_template('add.html', data = data,account=account)
+
+@app.route('/adduser', methods = ['POST', 'GET'])
+def adduser():
+    #data=db.insert(request.form)
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM users')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        full_name = request.form['full_name']
+        address = request.form['address']
+        age = request.form['age']
+        blood = request.form['blood']
+        # Check if account exists using MySQL
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM users WHERE Username = %s', (username))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into users table
+            apistr = username;
+            result = hashlib.md5(apistr.encode()) 
+            comb = username+'(~)'+password
+            s = comb.encode()
+            s1 = pybase64.b64encode(s)
+            api=s1.decode('utf-8')
+            #print(s1)
+            #r=pybase64.b64decode(s)
+            #print(r.decode('utf-8'))
+            
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s,%s)', (username, hashed_password, email, full_name, address, blood, age, api,0))
+            msg = 'User successfully registered!'
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+    # Show registration form with message (if any)
+    flash(msg)
+    return redirect(url_for('view', data = data,account=account))
+
+@app.route('/update/<int:ID>/')
+def update(ID):
+    #data = db.read(ID)
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM users WHERE ID=%s", [ID])
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+
+    if len(data) == 0:
+        return redirect(url_for('view', data = data,account=account))
+    else:
+        session['update'] = ID
+        return render_template('update.html', data = data,account=account)
+
+@app.route('/updateuser', methods = ['POST'])
+def updateuser():
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM users')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    if request.method == 'POST' and request.form['update']:
+        cursor.execute("UPDATE users set Username = %s, Email = %s, Full_Name= %s, Address= %s, Blood_Group=%s, Age = %s where ID = %s",
+                           (request.form['Username'], request.form['Email'],request.form['Full_Name'],request.form['Address'],request.form['Blood_Group'],request.form['Age'],session['update']))
+
+        flash('A user has been updated')
+
+        session.pop('update', None)
+
+        return redirect(url_for('view', data = data,account=account))
+    else:
+        return redirect(url_for('view', data = data,account=account))
+
+@app.route('/delete/<int:ID>/')
+def delete(ID):
+    #data = db.read(ID);
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM users WHERE ID=%s", [ID])
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+
+    if len(data) == 0:
+        return redirect(url_for('view', data = data,account=account))
+    else:
+        session['delete'] = ID
+        return render_template('delete.html', data = data,account=account)
+
+@app.route('/deleteuser', methods = ['POST'])
+def deleteuser():
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    if request.method == 'POST' and request.form['delete']:
+
+        cur = mysql.get_db().cursor()
+        cur.execute("SELECT * FROM users")
+        data = cur.fetchall()
+        cursor.execute("DELETE FROM users where ID = %s", (session['delete']))
+        flash('A user has been deleted')
+
+        session.pop('delete', None)
+
+        return redirect(url_for('view'))
+    else:
+        return redirect(url_for('view'))
+
+
+@app.route('/addoc/')
+def addoc():
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM doctors')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    return render_template('adddoc.html', data = data,account=account)
+
+@app.route('/adddoc', methods = ['POST', 'GET'])
+def adddoc():
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM doctors')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        full_name = request.form['full_name']
+        registration_number = request.form['registration_number']
+        contact_number = request.form['contact_number']
+        spec = request.form['specialization']
+        address = request.form['address']
+
+        # Check if account exists using MySQL
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM doctors WHERE Username = %s', (username))
+        accou = cursor.fetchone()
+        # If account exists show error and validation checks
+        if accou:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into users table
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            print(username + "\n" + str(hashed_password)+ "\n" + email+ "\n" +full_name+ "\n" +registration_number+ "\n" +contact_number+ "\n" +spec+ "\n" +address)
+            cursor.execute('INSERT INTO doctors VALUES (NULL, %s, %s, %s, %s, %s, %s ,%s, %s, %s, %s)', ( username, hashed_password, email, full_name, registration_number, contact_number, "" , spec, address ,0))
+            msg = 'Doctor successfully registered!'
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+    # Show registration form with message (if any)
+    flash(msg)
+    return redirect(url_for('viewdoctor', data = data,account=account))
+
+@app.route('/updatedc/<int:ID>/')
+def updatedc(ID):
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM doctors WHERE ID=%s", [ID])
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+
+    if len(data) == 0:
+        return redirect(url_for('viewdoctor', data = data,account=account))
+    else:
+        session['update'] = ID
+        return render_template('updatedoc.html', data = data,account=account)
+
+@app.route('/updatedoc', methods = ['POST'])
+def updatedoc():
+    cur = mysql.get_db().cursor()
+    cur.execute('SELECT * FROM doctors')
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    if request.method == 'POST' and request.form['update']:
+        #cursor.execute("UPDATE doctors set Username = %s, Email = %s, Full_Name= %s, Registration_Number= %s, Contact_Number=%s,  Specialization = %s, Address = %s where ID = %s",
+         #                  (request.form['Username'], request.form['Email'],request.form['Full_Name'],request.form['registration_number'],request.form['contact_number'],request.form['specialization'],request.form['address'],session['update']))
+        cursor.execute("UPDATE doctors set Username = %s, Email = %s, Full_Name= %s, Address = %s, Registration_Number= %s, Contact_Number=%s,  Specialization = %s where ID = %s",
+                           (request.form['Username'], request.form['Email'], request.form['Full_Name'],request.form['Address'], request.form['registration_number'],request.form['contact_number'],request.form['specialization'], session['update']))
+        flash('A doctor has been updated')
+
+        session.pop('update', None)
+
+        return redirect(url_for('viewdoctor', data = data,account=account))
+    else:
+        return redirect(url_for('viewdoctor', data = data,account=account))
+
+@app.route('/deletedo/<int:ID>/')
+def deletedc(ID):
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM doctors WHERE ID=%s", [ID])
+    data = cur.fetchall()
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+
+    if len(data) == 0:
+        return redirect(url_for('viewdoctor', data = data,account=account))
+    else:
+        session['delete'] = ID
+        return render_template('deletedoc.html', data = data,account=account)
+
+@app.route('/deletedoc', methods = ['POST'])
+def deletedoc():
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM admin WHERE Username = %s', [session['username']])
+    account = cursor.fetchone()
+    if request.method == 'POST' and request.form['delete']:
+
+        cur = mysql.get_db().cursor()
+        cur.execute("SELECT * FROM doctors")
+        data = cur.fetchall()
+        cursor.execute("DELETE FROM doctors where ID = %s", (session['delete']))
+        flash('A doctor has been deleted')
+
+        session.pop('delete', None)
+
+        return redirect(url_for('viewdoctor'))
+    else:
+        return redirect(url_for('viewdoctor'))
+
+# forgot User password
+@app.route('/userpasforgot', methods = ['POST','GET'])
+def userpasforgot():
+    if 'loggedin' in session:
+        return redirect('/')
+    if request.method == "POST":
+        email = request.form["email"]
+        token = str(uuid.uuid4())
+        cur = mysql.get_db().cursor()
+        result = cur.execute("SELECT * FROM users Where email=%s",[email])
+        if result>0:
+            data = cur.fetchone()
+            msg = Message(subject="Forgot password request ", sender="chalielijalem@gmail.com", recipients=[email])
+            msg.body = render_template("sent.html", token=token, data=data)
+            mail.send(msg)
+            cur = mysql.get_db().cursor()
+            cur.execute("UPDATE users SET token=%s Where email=%s",[token,email])
+            mysql.get_db().commit()
+            cur.close()
+            flash("Email already sent to your email", "success")
+            return redirect('/userpasforgot')
+        else:
+            flash("Email do not match","danger")
+
+    return render_template('userforgot.html')
+
+# reset User password
+@app.route('/userpassreset/<token>', methods = ['POST','GET'])
+def userpassreset(token):
+    if 'loggedin' in session:
+        return redirect('/')
+    if request.method == "POST":
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+        token1 = str(uuid.uuid4())
+        if password != confirm_password:
+            flash("Password donot match", "danger")
+            return redirect("userpassreset")
+        password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        cur = mysql.get_db().cursor()
+        m=cur.execute("SELECT * FROM users Where token=%s",[token])
+        user = cur.fetchone()
+        if m>0:
+            cur = mysql.get_db().cursor()
+            cur.execute("UPDATE users SET token=%s, password=%s WHERE token=%s",[token1, password, token])
+            mysql.get_db().commit()
+            cur.close()
+            flash("Your password successfully updated","success")
+            return redirect("/login")
+        else:
+            flash("Your Token is invalid", "danger")
+            return redirect('/')
+    return render_template('userreset.html')
+
+        
 
 # http://localhost:5000/logout - this will be the logout page
 @app.route('/logout')

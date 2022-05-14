@@ -1,0 +1,130 @@
+ {% extends 'dashboardExtender.html' %} {% block sidebar %}
+<div class="scrollbar-sidebar">
+    <div class="app-sidebar__inner">
+        <ul class="vertical-nav-menu">
+            <li class="app-sidebar__heading">Admin Dashboard</li>
+            <li>
+                <a href="#" class="mm-active">
+                    <i class="metismenu-icon fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('view') }}">
+                    <i class="metismenu-icon fa fa-user"></i> Pateint(Device User) List
+                </a>
+            </li>
+            <li>
+                <a href="{{url_for('viewdoctor')}}">
+                    <i class="metismenu-icon fa fa-user-md">
+                    </i>Doctor list
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-address-card"></i>Device Serial Number
+                </a>
+
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %} {% block body %}
+<div class="wrapper">
+    <div class="content-wrapper">
+        <div class="container">
+            <section class="content">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <center>
+                            <h3 class="box-title">Add User </h3>
+                        </center>
+                    </div>
+
+                    <form class="form-horizontal" method="post" action="{{ url_for('adduser') }}">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Username</label>
+
+                                <div class="col-sm-10">
+                                    <p><input type="text" class="form-control" placeholder="Username" name="username" /></p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Password</label>
+
+                                <div class="col-sm-10">
+                                    <p><input type="password" class="form-control" placeholder="Password" name="password" /></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Email</label>
+
+                                <div class="col-sm-10">
+                                    <p><input type="text" class="form-control" placeholder="Email" name="email"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Full_Name</label>
+
+                                <div class="col-sm-10">
+                                    <p><input type="text" class="form-control" placeholder="Full Name" name="full_name"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Address</label>
+                                <div class="col-sm-10">
+                                    <p><input type="text" class="form-control" class="form-control" placeholder="Address" name="address"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Blood_Group</label>
+                                <div class="col-sm-10">
+                                    <p><select  placeholder="Blood Group" name="blood" style="padding: 10px;border:0px;font-size: 15px;outline: none;">
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                      </select></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Age</label>
+
+                                <div class="col-sm-10">
+                                    <p><input type="text" class="form-control" placeholder="Age" name="age"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <a href="/"><button type="button" class="btn btn-default">Cancel</button></a>
+                            <input name="save" type="submit" class="btn btn-info pull-right" value="Save">
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block script%}
+<script src="{{ url_for('static', filename='js/jquery-2.2.3.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/app.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap.min.js')}}"></script>
+
+<script>
+    $(function() {
+        $("#dataphone").DataTable();
+
+    });
+</script>
+{% endblock%}
