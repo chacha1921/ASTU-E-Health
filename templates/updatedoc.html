@@ -1,0 +1,136 @@
+{% extends 'dashboardExtender.html' %} {% block sidebar %}
+<div class="scrollbar-sidebar">
+    <div class="app-sidebar__inner">
+        <ul class="vertical-nav-menu">
+            <li class="app-sidebar__heading">Admin Dashboard</li>
+            <li>
+                <a href="#" class="mm-active">
+                    <i class="metismenu-icon fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('view') }}">
+                    <i class="metismenu-icon fa fa-user"></i> Pateint(Device User) List
+                </a>
+            </li>
+            <li>
+                <a href="{{url_for('viewdoctor')}}">
+                    <i class="metismenu-icon fa fa-user-md">
+                    </i>Doctor list
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-address-card"></i>Device Serial Number
+                </a>
+
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %} {% block body %}
+<div class="wrapper">
+    <div class="content-wrapper">
+        <div class="container">
+            <section class="content">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <center>
+                            <h3 class="box-title">Update doctor</h3>
+                        </center>
+                    </div>
+
+                    <form class="form-horizontal" method="POST" action="/updatedoc">
+                        {% for row in data %}
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Username</label>
+
+                                <div class="col-sm-10">
+                                    <input name="Username" value="{{ row[1] }}" type="text" class="form-control" placeholder="Username" autocomplete="off" required>
+                                </div>
+                            </div>
+
+                          <div class="form-group">
+                                <label class="col-sm-2 control-label">Email</label>
+
+                                <div class="col-sm-10">
+                                    <input name="Email" value="{{ row[3] }}" type="text" class="form-control" placeholder="Email" autocomplete="off" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Full_Name</label>
+                                <div class="col-sm-10">
+                                    <input name="Full_Name" value="{{ row[4] }}" type="text" class="form-control" placeholder="Full_Name" autocomplete="off" required>
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <label class="col-sm-2 control-label">Registration_Number</label>
+                                <div class="col-sm-10">
+                                    <input name="registration_number" value="{{ row[5] }}" type="text" class="form-control" placeholder="Registration_Number" autocomplete="off" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Contact_Number</label>
+                                <div class="col-sm-10">
+                                    <input name="contact_number" value="{{ row[6] }}" type="text" class="form-control" placeholder="Contact_Number" autocomplete="off" required>
+                                </div>
+                            </div>
+                   <!--         <div class="form-group">
+                                <label class="col-sm-2 control-label">Hospital_Name</label>
+                                <div class="col-sm-10">
+                                    <input name="hospital_name" value="{{ row[7] }}" type="text" class="form-control" placeholder="Hospital_Name" >
+                                </div>
+                            </div> -->
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Specialization </label>
+
+                                <div class="col-sm-10">
+                                    <p><select name="specialization" placeholder="{{ row[8] }}" style="padding: 10px;border:0px;font-size: 15px;">
+                                        <option value="Dermatologist">Dermatologist</option>
+                                        <option value="Allergist/Immunologists">Allergist/Immunologists</option>
+                                        <option value="Gastroenterologist">Gastroenterologist</option>
+                                        <option value="Hepatologist">Hepatologist</option>
+                                        <option value="Pharmacologist">Pharmacologist</option>
+                                        <option value="HIV Specialist">HIV Specialist</option>
+                                        <option value="Endocrinologist">Endocrinologist</option>
+                                        <option value="Asthma Specialist">Asthma Specialist</option>
+                                         <option value="Cardiologist">Cardiologist</option>
+                                         <option value="Otolaryngologist">Otolaryngologist</option>
+                                         <option value="Paralysis Doctor">Paralysis Doctor</option>
+                                         <option value="General Physician">General Physician</option>
+                                         <option value="Microbiologist">Microbiologist</option>
+                                         <option value="Pulmonologists">Pulmonologists</option>
+                                         <option value="Pediatric">Pediatric</option>
+                                         <option value="Proctologist">Proctologist</option>
+                                         <option value="ENT Specialist">ENT Specialist</option>
+                                         <option value="Urologist">Urologist</option>
+                                         <option value="Expert Physician">Expert Physician</option>
+                                         <option value="Physician">Physician</option>
+                                      </select></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Address</label>
+                                <div class="col-sm-10">
+                                    <input name="Address" value="{{ row[9] }}" type="text" class="form-control" placeholder="Address" autocomplete="off" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <a href="/"><button type="button" class="btn btn-default">Cancel</button></a>
+                            <input name="update" type="submit" class="btn btn-info pull-right" value="Update">
+                        </div>
+                        {% endfor %}
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block script%}
+<script src="{{ url_for('static', filename='js/jquery-2.2.3.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/app.min.js')}}"></script>
+{% endblock%}

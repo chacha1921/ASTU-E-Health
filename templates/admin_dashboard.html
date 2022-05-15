@@ -1,0 +1,61 @@
+{% extends 'dashboardExtender.html' %} {% block sidebar %}
+<div class="scrollbar-sidebar">
+    <div class="app-sidebar__inner">
+        <ul class="vertical-nav-menu">
+            <li class="app-sidebar__heading">Admin Dashboard</li>
+            <li>
+                <a href="#" class="mm-active">
+                    <i class="metismenu-icon fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('view') }}">
+                    <i class="metismenu-icon fa fa-user"></i> Pateint(Device User) List
+                </a>
+            </li>
+            <li>
+                <a href="{{url_for('viewdoctor')}}">
+                    <i class="metismenu-icon fa fa-user-md">
+                    </i>Doctor list
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-address-card"></i>Device Serial Number
+                </a>
+
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %} {% block body %}
+<div class="app-main__inner ">
+    <div class="app-page-title ">
+        <div class="page-title-wrapper ">
+            <div class="page-title-heading ">
+                <div class="page-title-icon ">
+                    <i class="fa fa-bed icon-gradient bg-amy-crisp "> </i>
+                </div>
+                <div>Admin Dashboard
+                    <div class="page-title-subheading "> Astu-E health Platform.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content ">
+        <div class="tab-pane tabs-animation fade show active " id="tab-content-0 " role="tabpanel ">
+            <div class="row ">
+                <div class="col-lg-12 ">
+
+                    <div class="main-card mb-3 card ">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %} {% block script%}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js " integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj " crossorigin="anonymous "></script>
+    {% endblock%}

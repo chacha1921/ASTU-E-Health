@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>ASTU E-Health</title>
+    <link rel="icon" href="/static/img/favicon.png">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/bootstrap.min.css')}}" >
+     
+    <!-- animate CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/animate.css')}}">
+    <!-- owl carousel CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/owl.carousel.min.css')}}">
+    <!-- themify CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/themify-icons.css')}}">
+    <!-- flaticon CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/flaticon.css')}}">
+    <!-- magnific popup CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/magnific-popup.css')}}">
+    <!-- nice select CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/nice-select.css')}}">
+    <!-- swiper CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/slick.css.css')}}">
+    <!-- style CSS -->
+    <link rel="stylesheet" type=text/css href="{{url_for('static', filename='css/home.css')}}"> 
+    
+</head>
+
+<body>
+    <!--::header part start::-->
+    <header class="main_menu home_menu">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <a class="navbar-brand" href="{{ url_for('index') }}"> <img src="/static/img/logo.png" style="height:78px; width:78px;"> </a><div class="mb-10 mr-10 badge badge-pill badge-primary" style="font-size: 28px;">ASTU E-Health</div>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse main-menu-item justify-content-center"
+                            id="navbarSupportedContent">
+                            <ul class="navbar-nav align-items-center">
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="{{ url_for('index') }}" style="font-size:20px;">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" style="font-size:20px;">Developers</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('doclogin') }}" style="font-size:20px;">Doctors</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url_for('login')}}" style="font-size:20px;">Personal User</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url_for('adminlogin')}}" style="font-size:20px;">Admin</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--<a class="nav-link badge-primary" style="font-size: 20px;" href="{{url_for('login')}}">Diagnose</a>-->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Header part end-->
+    <br><br><br><br><br><br><br><br><br><br>
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissable" role="alert" style="margin-top: 20px; margin-right: 20px; margin-left: 20px">
+        <button class="close" type="button" data-dismiss="alert" aria-label="close">
+          <span aria-hidden="true">x</span>
+        </button>
+        {{message}}
+      </div>
+    {% endfor %}
+{% endwith %}
+        <div class="row">
+            <div class="col-md-6 ">
+                <form  method="POST" >
+                    <h2 class="text-center">Forgot Password</h2>
+                    <p class="text-center">Enter your email address</p>
+
+                    <div class="alert alert-danger text-center">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="email" name="email" placeholder="Enter email address" required value="">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control button" type="submit" name="check-email" value="Continue">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+ <!-- footer part start-->
+ <footer class="footer-area">
+  
+    <div class="copyright_part">
+        <div class="container">
+            <div class="row align-items-center">
+                <p class="footer-text m-0 col-lg-8 col-md-12">
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i class="ti-heart" aria-hidden="true"></i> by ASTU CSE Students.
+
+</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- footer part end-->
+
+<!-- jquery plugins here-->
+
+<script type="text/javascript"
+     src="{{url_for('static', filename='js/jquery-1.12.1.min.js')}}" ></script>
+<!-- popper js -->
+<script type="text/javascript"
+     src="{{url_for('static', filename='js/popper.min.js')}}"></script>
+<!-- bootstrap js -->
+<script type="text/javascript"
+     src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<!-- owl carousel js -->
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/jquery.nice-select.min.js') }}"></script>
+<!-- contact js -->
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/jquery.ajaxchimp.min.js') }}"></script>
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/jquery.form.js') }}"></script>
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/mail-script.js') }}"></script>
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/contact.js') }}"></script>
+<!-- custom js -->
+<script type="text/javascript"
+     src="{{ url_for('static', filename='js/custom.js') }}"></script>
+</body>
+
+</html>

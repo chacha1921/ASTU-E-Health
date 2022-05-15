@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ASTU E-Health | Machine Learning based HealthCare App</title>
+    <title>ASTU E-Health</title>
     <link rel="icon" href="/static/img/favicon.png">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type=text/css href="{{url_for('static',filename='css/bootstrap.min.css')}}" >
@@ -54,9 +54,15 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ url_for('doclogin') }}" style="font-size:20px;">Doctors</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url_for('login')}}" style="font-size:20px;">Personal User</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url_for('adminlogin')}}" style="font-size:20px;">Admin</a>
+                                </li>
                             </ul>
                         </div>
-                        <a class="nav-link badge-primary" style="font-size: 20px;" href="{{url_for('login')}}">Diagnose</a>
+                        <!--<a class="nav-link badge-primary" style="font-size: 20px;" href="{{url_for('login')}}">Diagnose</a>-->
                     </nav>
                 </div>
             </div>

@@ -1,0 +1,68 @@
+{% extends 'dashboardExtender.html' %} {% block sidebar %}
+<div class="scrollbar-sidebar">
+    <div class="app-sidebar__inner">
+        <ul class="vertical-nav-menu">
+            <li class="app-sidebar__heading">Admin Dashboard</li>
+            <li>
+                <a href="#" class="mm-active">
+                    <i class="metismenu-icon fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-home"></i> Overview
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('view') }}">
+                    <i class="metismenu-icon fa fa-home"></i> Pateint(Device User) List
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-user">
+                  </i>Doctor list
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-user"></i>Device Serial Number
+                </a>
+
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %} {% block body %}
+<div class="content-wrapper">
+    <div class="container">
+        <section class="content">
+            <div class="error-page">
+                <h2 class="headline text-yellow"> 404</h2>
+
+                <div class="error-content">
+                    <h3><i class="fa fa-warning text-yellow"></i> Oops! Page not found.</h3>
+                    <p>
+                        We could not find the page you were looking for. Meanwhile, you may return to <a href="/"><code>index page</code></a>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+</div>
+{% endblock %} {% block script%}
+
+<script src="{{ url_for('static', filename='js/jquery-2.2.3.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/app.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap.min.js')}}"></script>
+
+<script>
+    $(function() {
+        $("#dataphone").DataTable();
+
+    });
+</script>
+{% endblock%}

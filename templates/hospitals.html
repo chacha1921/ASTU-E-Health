@@ -6,7 +6,7 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('home') }}">
+                <a href="{{ url_for('home') }}" class="mm-active">
                     <i class="metismenu-icon fa fa-home"></i>
                     Home
                 </a>
@@ -14,7 +14,7 @@
             
             <li>
                 <a href="{{ url_for('bmi') }}">
-                    <i class="metismenu-icon fa fa-user">
+                    <i class="metismenu-icon fa fa-medkit">
                     </i>BMI
                 </a>
             </li>
@@ -31,9 +31,42 @@
                     </i>Diagnose(Text)
                 </a>
             </li>
+            <li>
+                <a href="{{ url_for('healthstatus') }}">
+                    <i class="metismenu-icon fa fa-hospital-o"></i>
+                    Health Status
+                </a>
+            </li>
             
+            <li>
+                <a href="#">
+                    <i class="metismenu-icon fa fa-assistive-listening-systems">
+                    </i>View Recommendation
+                </a>
+            </li>
+            <li>
+                <a href="/chattingh/{{ session['id'] }}">
+                    <i class="metismenu-icon fa fa-commenting-o">
+                    </i>Consultancy
+                </a>
+            </li>
+
+            <li>
+                <div class="btn-group">
+                    <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        
+                        <i class="metismenu-icon fa fa-calendar-check-o">
+                        </i>Appointment
+                    </a>
+                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
+                        <a href="{{ url_for('book') }}" tabindex="0" class="dropdown-item">Book Appointment</a>
+                        <div tabindex="-1" class="dropdown-divider"></div>
+                        <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
+                    </div>
+                </div>
+            </li>
              <li>
-                <a href="{{ url_for('hospitals') }}" class="mm-active">
+                <a href="{{ url_for('hospitals') }}">
                     <i class="metismenu-icon fa fa-rocket">
                     </i>Hospitals
                 </a>

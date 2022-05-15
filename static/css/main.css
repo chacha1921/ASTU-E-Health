@@ -11602,7 +11602,7 @@ button,
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
-	text-fill-color: transparent
+	text-fill-color: transparent;
 }
 
 .font-size-xlg {
@@ -11879,7 +11879,7 @@ Copyright (c) 2015 Daniel Eden
 */
 
 body {
-	-webkit-backface-visibility: hidden
+	-webkit-backface-visibility: hidden;
 }
 
 .animated {
@@ -15909,7 +15909,7 @@ legend {
 	font-style: normal;
 	font-weight: 900;
 	src: url("{{ url_for('static', filename='assets/fonts/fa-solid-900.eot') }}");
-	src: url("{{ url_for('static', filename='assets/fonts/fa-solid-900.eot?#iefix') }}")format("embedded-opentype"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.woff2')  }}")format("woff2"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.woff)' }}") format("woff"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.ttf') }}")format("truetype"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.svg#fontawesome' }}") format("svg")
+	src: url("{{ url_for('static', filename='assets/fonts/fa-solid-900.eot?#iefix') }}") format("embedded-opentype"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.woff2')  }}")format("woff2"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.woff)' }}") format("woff"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.ttf') }}")format("truetype"), url("{{ url_for('static', filename='assets/fonts/fa-solid-900.svg#fontawesome' }}") format("svg");
 }
 
 .fa,
@@ -21470,8 +21470,8 @@ legend {
 
 @font-face {
 	font-family: 'Pe-icon-7-stroke';
-	src: url({{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.eot' }}");
-	src: url({{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.eot?#iefixd7yf1v' }}") format("embedded-opentype"), url({{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.woff' }}") format("woff"), url({{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.ttf' }}") format("truetype"), url({{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.svg#Pe-icon-7-stroke' }}") format("svg");
+	src: url("{{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.eot' }}");
+	src: url("{{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.eot?#iefixd7yf1v' }}") format("embedded-opentype"), url("{{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.woff' }}") format("woff"), url("{{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.ttf' }}") format("truetype"), url("{{ url_for('static', filename='assets/fonts/Pe-icon-7-stroke.svg#Pe-icon-7-stroke' }}") format("svg");
 	font-weight: normal;
 	font-style: normal
 }
@@ -21480,7 +21480,6 @@ legend {
 [class*=" pe-7s-"] {
 	display: inline-block;
 	font-family: 'Pe-icon-7-stroke';
-	speak: none;
 	font-style: normal;
 	font-weight: normal;
 	font-variant: normal;
