@@ -6,12 +6,12 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('doc_dash') }}">
+                <a href="{{ url_for('doc_dash') }}" >
                     <i class="metismenu-icon fa fa-home"></i> Home
                 </a>
             </li>
             <li>
-                <a href="/docsensorh/{{ session['id'] }}">
+                <a href="/docsensorh/{{ session['id'] }}" class="mm-active">
                     <i class="metismenu-icon fa fa-binoculars"></i> View Sensor Data
                 </a>
             </li>
@@ -23,7 +23,7 @@
                 </a>
             </li>
             <li>
-                <a href="/docchattingh/{{ session['id'] }}"  class="mm-active">
+                <a href="/docchattingh/{{ session['id'] }}" >
                     <i class="metismenu-icon fa fa-commenting-o">
                     </i>Consultancy
                 </a>
@@ -62,53 +62,38 @@
                 <div class="page-title-icon">
                     <i class="fa fa-file-text icon-gradient bg-amy-crisp"> </i>
                 </div>
-                <div>Consultancy
-                    <div class="page-title-subheading">Chat With Personal Users
+                <div>Sensor Data
+                    <div class="page-title-subheading">Sensor data of Personal Users
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="row" onload="ajax();">
-        <div class="col-lg-4" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
+        <div class="col-lg-3" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
             <div style="text-align: center;font-size: 18px;background-color: #ddd;border-radius: 4px;color: #5e5fa4;margin-bottom: 8px;">
                 <span>Users Chart</span>
             </div>
             <ul class="list-group">
                 {% for user in users %}
-                    {% for mes in patient %}
+                    
+                    {% for mes in person %}
                         {% if user[5]==mes %}
-                            <li class="list-group-item"><a href="/docchatting/{{ user[0] }}"> {{user[5]}} </a>
-                                {% if user[10] != 0 %}
-                                    <span style="height: 12px;width: 12px;background-color: #1fc124;border-radius: 6px;
-                                    float: right;margin-top: 5px;"></span>
-                                {% else %}
-                                    <span style="height: 12px;width: 12px;background-color: #8a8a8a;border-radius: 6px;
-                                    float: right;margin-top: 5px;"></span>
-                                {% endif %}
+                            <li class="list-group-item"><a href="/docsensor/{{ user[0] }}"> {{user[5]}} </a>
+                                
                             </li>
+                            
                         {% endif %}
-                    {% endfor %}    
+                    {% endfor %}
                 {% endfor %}
             </ul>
         </div>
         <div class="col-lg-6" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
 
             {% if session['lid'] %}
-                    <div style="text-align: center;font-size: 18px; color: #22aa45;background-color: #ddd;border-radius: 4px;">
-                        <span>{{ session['name'] }}</span>
-                    </div>
-                    <div id="chat-box" style="overflow-y: scroll; height: 350px; padding: 10px 0px 0px 0px;">
-                        <div id="chats"></div>
-                    </div>
-                    {% from "includes/_formhelpers.html" import render_field %}
-                    <div>
-                        <form method="POST" action="">
-                        <div class="form-group">
-                            {{render_field(form.body, class_="form-control", value="", placeholder="Enter your text...")}}
-                        </div>
-                        <button type="submit" class="btn btn-primary pull-right">Send</button>
-                        </form>
+                    <div style="text-align: center;">
+                        <h1>Welcome</h1>
+                        <p class="lead">Select users and see sensor data...</p>
                     </div>
             {% endif %}
 

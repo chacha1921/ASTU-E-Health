@@ -6,7 +6,7 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('home') }}" class="mm-active">
+                <a href="{{ url_for('home') }}" >
                     <i class="metismenu-icon fa fa-home"></i>
                     Home
                 </a>
@@ -24,13 +24,6 @@
                     </i>Diagnose(Symptoms)
                 </a>
             </li>
-            
-            <li>
-                <a href="{{ url_for('diagnosedetails') }}">
-                    <i class="metismenu-icon fa fa-plus-square">
-                    </i>Diagnose(Text)
-                </a>
-            </li>
             <li>
                 <a href="{{ url_for('healthstatus') }}">
                     <i class="metismenu-icon fa fa-hospital-o"></i>
@@ -39,7 +32,7 @@
             </li>
             
             <li>
-                <a href="#">
+                <a href="/recommendingh/{{ session['id'] }}">
                     <i class="metismenu-icon fa fa-assistive-listening-systems">
                     </i>View Recommendation
                 </a>
@@ -64,12 +57,6 @@
                         <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
                     </div>
                 </div>
-            </li>
-             <li>
-                <a href="{{ url_for('hospitals') }}">
-                    <i class="metismenu-icon fa fa-rocket">
-                    </i>Hospitals
-                </a>
             </li>
         </ul>
     </div>
@@ -103,6 +90,9 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="tab-eg11-0" role="tabpanel">
                                     <table class="mb-0 table table-striped">
+                                        <a href="/updatemy/{{ account[0]}}">
+                                            <button type="button" class="btn btn-primary">update</button>
+                                        </a>
                                         <thead>
                                             <th>Account Information</th>
                                             <th>Detail</th>
@@ -118,7 +108,7 @@
                                             </tr>
                                             <tr>
                                                 <th scope="row">Name</th>
-                                                <td>{{ account[4] }}</td>
+                                                <td>{{ account[5] }}</td>
                                             </tr>
                                             {% if isDoctor %}
                                             <tr>
@@ -145,18 +135,14 @@
                                             {% if not isDoctor %}
                                             <tr>
                                                 <th scope="row">Address</th>
-                                                <td>{{ account[5] }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Blood Group</th>
                                                 <td>{{ account[6] }}</td>
                                             </tr>
                                             <tr>
-                                                <th scope="row">Age</th>
+                                                <th scope="row">Blood Group</th>
                                                 <td>{{ account[7] }}</td>
                                             </tr>
                                             <tr>
-                                                <th scope="row">API Token</th>
+                                                <th scope="row">Birth Date</th>
                                                 <td>{{ account[8] }}</td>
                                             </tr>
                                             {% endif %}

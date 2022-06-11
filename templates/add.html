@@ -97,7 +97,24 @@
                                 <label class="col-sm-2 control-label">Age</label>
 
                                 <div class="col-sm-10">
-                                    <p><input type="text" class="form-control" placeholder="Age" name="age"></p>
+                                    <p><input type="date" id="datefield" name="date" placeholder="Birt Date( dd-mm-yyyy)">
+                                        <script>
+                                            var today = new Date();
+                                            var dd = today.getDate();
+                                            var mm = today.getMonth() + 1; //January is 0!
+                                            var yyyy = today.getFullYear();
+                        
+                                            if (dd < 10) {
+                                            dd = '0' + dd;
+                                            }
+                        
+                                            if (mm < 10) {
+                                            mm = '0' + mm;
+                                            } 
+                                                
+                                            today = yyyy + '-' + mm + '-' + dd;
+                                            document.getElementById("datefield").setAttribute("max", today);
+                                        </script></p>
                                 </div>
                             </div>
                         </div>

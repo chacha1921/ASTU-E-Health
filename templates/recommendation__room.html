@@ -6,7 +6,7 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('home') }}" class="mm-active">
+                <a href="{{ url_for('home') }}" >
                     <i class="metismenu-icon fa fa-home"></i>
                     Home
                 </a>
@@ -14,7 +14,7 @@
             
             <li>
                 <a href="{{ url_for('bmi') }}">
-                    <i class="metismenu-icon fa fa-user">
+                    <i class="metismenu-icon fa fa-medkit">
                     </i>BMI
                 </a>
             </li>
@@ -24,29 +24,22 @@
                     </i>Diagnose(Symptoms)
                 </a>
             </li>
-            
-            <li>
-                <a href="{{ url_for('diagnosedetails') }}">
-                    <i class="metismenu-icon fa fa-plus-square">
-                    </i>Diagnose(Text)
-                </a>
-            </li>
             <li>
                 <a href="{{ url_for('healthstatus') }}">
-                    <i class="metismenu-icon fa fa-home"></i>
+                    <i class="metismenu-icon fa fa-hospital-o"></i>
                     Health Status
                 </a>
             </li>
             
             <li>
-                <a href="#">
-                    <i class="metismenu-icon fa fa-user">
+                <a href="/recommendingh/{{ session['id'] }}" class="mm-active">
+                    <i class="metismenu-icon fa fa-assistive-listening-systems">
                     </i>View Recommendation
                 </a>
             </li>
             <li>
                 <a href="/chattingh/{{ session['id'] }}">
-                    <i class="metismenu-icon fa fa-plus-circle">
+                    <i class="metismenu-icon fa fa-commenting-o">
                     </i>Consultancy
                 </a>
             </li>
@@ -55,7 +48,7 @@
                 <div class="btn-group">
                     <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         
-                        <i class="metismenu-icon fa fa-user">
+                        <i class="metismenu-icon fa fa-calendar-check-o">
                         </i>Appointment
                     </a>
                     <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
@@ -64,12 +57,6 @@
                         <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
                     </div>
                 </div>
-            </li>
-             <li>
-                <a href="{{ url_for('hospitals') }}">
-                    <i class="metismenu-icon fa fa-rocket">
-                    </i>Hospitals
-                </a>
             </li>
         </ul>
     </div>
@@ -87,7 +74,7 @@
     document.getElementById('chats').innerHTML = req.responseText;
     }
     }
-    req.open('POST', '/chats', true);
+    req.open('POST', '/recommends', true);
     req.send();
     }
     setInterval(function(){ajax()}, 10);
@@ -99,8 +86,8 @@
                 <div class="page-title-icon">
                     <i class="fa fa-file-text icon-gradient bg-amy-crisp"> </i>
                 </div>
-                <div>Consultancy
-                    <div class="page-title-subheading">Chat With Doctors
+                <div>Recommendation
+                    <div class="page-title-subheading">Sent from Doctors
                     </div>
                 </div>
             </div>
@@ -113,14 +100,8 @@
             </div>
             <ul class="list-group">
                 {% for user in users %}
-                        <li class="list-group-item"><a href="/chatting/{{ user[0] }}"> {{user[4]}} </a>
-                            {% if user[10] != 0 %}
-                                <span style="height: 12px;width: 12px;background-color: #1fc124;border-radius: 6px;
-                                float: right;margin-top: 5px;"></span>
-                            {% else %}
-                                <span style="height: 12px;width: 12px;background-color: #8a8a8a;border-radius: 6px;
-                                float: right;margin-top: 5px;"></span>
-                            {% endif %}
+                        <li class="list-group-item"><a href="/recommending/{{ user[0] }}"> {{user[4]}} </a>
+                            
                         </li>
                    
                 {% endfor %}
@@ -134,15 +115,27 @@
                         <span>{{ session['name'] }}</span>
                     </div>
                     <div id="chat-box" style="overflow-y: scroll; height: 350px; padding: 10px 0px 0px 0px;">
-                        <div id="chats"></div>
+                        <div id="cha">
+                            {% for message in recom %}
+                               {% if message[3] == account[5] %}
+                                        <div class="" style="text-align:left; padding:2px 5px;">
+                                            <p>
+                                                <span class="" style="background-color: #28a7ab;color: #fff;margin: 1px 0;padding: 6px 12px; border-radius: 12px;"> {{message[1]}}</span>
+                                            </p>
+                                        </div>
+                                        <div class="" style="text-align:right; padding:2px 5px;">
+                                            <p>
+                                                <span class="" style="background-color: #dd92b2;color: #fff;margin: 1px 0;padding: 6px 12px; border-radius: 12px;"> {{message[4]}}</span>
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                     {% from "includes/_formhelpers.html" import render_field %}
                     <div>
                         <form method="POST" action="">
-                        <div class="form-group">
-                            {{render_field(form.body, class_="form-control", value="", placeholder="Enter your text...")}}
-                        </div>
-                        <button type="submit" class="btn btn-primary pull-right">Send</button>
+                        
                         </form>
                     </div>
                 {% else %}

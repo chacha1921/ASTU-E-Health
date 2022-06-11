@@ -57,21 +57,7 @@
                         </div>
                         <button class="close"></button>
                     </div>
-                    <ul class="header-menu nav">
-                        <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link">
-                                <i class="nav-link-icon fa fa-database"> </i>
-                                API
-                            </a>
-                        </li>
-                        
-                        <li class="dropdown nav-item">
-                            <a href="javascript:void(0);" class="nav-link">
-                                <i class="nav-link-icon fa fa-cog"></i>
-                                Settings
-                            </a>
-                        </li>
-                    </ul>        </div>
+                       </div>
                 <div class="app-header-right">
                     <div class="header-btn-lg pr-0">
                         <div class="widget-content p-0">
@@ -144,18 +130,18 @@
                         <ul class="vertical-nav-menu">
                             <li class="app-sidebar__heading">Dashboard</li>
                             <li>
-                                <a href="{{ url_for('doc_dash') }}" class="mm-active">
+                                <a href="{{ url_for('doc_dash') }}">
                                     <i class="metismenu-icon fa fa-home"></i> Home
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="/docsensorh/{{ session['id'] }}">
                                     <i class="metismenu-icon fa fa-binoculars"></i> View Sensor Data
                                 </a>
                             </li>
                 
                             <li>
-                                <a href="#">
+                                <a href="/docrecommendingh/{{ session['id'] }}">
                                     <i class="metismenu-icon fa fa-assistive-listening-systems">
                                     </i>Send Recommendation
                                 </a>
@@ -167,7 +153,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url_for('curappointment') }}">
+                                <a href="{{ url_for('curappointment') }}" class="mm-active">
                                     <i class="metismenu-icon fa fa-calendar-check-o">
                                     </i>Appointment
                                 </a>

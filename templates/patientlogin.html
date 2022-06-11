@@ -42,7 +42,24 @@
                  <option value="O+">O+</option>
                  <option value="O-">O-</option>
                </select></p>
-              <p><input type="text" placeholder="Age" name="age"></p>
+              <p><input type="date" id="datefield" name="date" placeholder="Birt Date( dd-mm-yyyy)">
+                <script>
+                    var today = new Date();
+                    var dd = today.getDate();
+                    var mm = today.getMonth() + 1; //January is 0!
+                    var yyyy = today.getFullYear();
+
+                    if (dd < 10) {
+                    dd = '0' + dd;
+                    }
+
+                    if (mm < 10) {
+                    mm = '0' + mm;
+                    } 
+                        
+                    today = yyyy + '-' + mm + '-' + dd;
+                    document.getElementById("datefield").setAttribute("max", today);
+                </script></p>
               <p><input type="password" placeholder="Password" name="password" /></p>
               <p><input type="submit" value="Sign Up"></p>
           </form>

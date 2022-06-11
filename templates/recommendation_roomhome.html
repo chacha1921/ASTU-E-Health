@@ -6,7 +6,7 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('home') }}" class="mm-active">
+                <a href="{{ url_for('home') }}" >
                     <i class="metismenu-icon fa fa-home"></i>
                     Home
                 </a>
@@ -14,39 +14,32 @@
             
             <li>
                 <a href="{{ url_for('bmi') }}">
-                    <i class="metismenu-icon fa fa-user">
+                    <i class="metismenu-icon fa fa-medkit">
                     </i>BMI
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('diagnose') }}">
+                <a href="{{ url_for('diagnose') }}" >
                     <i class="metismenu-icon fa fa-plus-circle">
                     </i>Diagnose(Symptoms)
                 </a>
             </li>
-            
-            <li>
-                <a href="{{ url_for('diagnosedetails') }}">
-                    <i class="metismenu-icon fa fa-plus-square">
-                    </i>Diagnose(Text)
-                </a>
-            </li>
             <li>
                 <a href="{{ url_for('healthstatus') }}">
-                    <i class="metismenu-icon fa fa-home"></i>
+                    <i class="metismenu-icon fa fa-hospital-o"></i>
                     Health Status
                 </a>
             </li>
             
             <li>
-                <a href="#">
-                    <i class="metismenu-icon fa fa-user">
+                <a href="/recommendingh/{{ session['id'] }}" class="mm-active">
+                    <i class="metismenu-icon fa fa-assistive-listening-systems">
                     </i>View Recommendation
                 </a>
             </li>
             <li>
                 <a href="/chattingh/{{ session['id'] }}">
-                    <i class="metismenu-icon fa fa-plus-circle">
+                    <i class="metismenu-icon fa fa-commenting-o">
                     </i>Consultancy
                 </a>
             </li>
@@ -55,7 +48,7 @@
                 <div class="btn-group">
                     <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         
-                        <i class="metismenu-icon fa fa-user">
+                        <i class="metismenu-icon fa fa-calendar-check-o">
                         </i>Appointment
                     </a>
                     <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-top">
@@ -64,12 +57,6 @@
                         <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
                     </div>
                 </div>
-            </li>
-             <li>
-                <a href="{{ url_for('hospitals') }}">
-                    <i class="metismenu-icon fa fa-rocket">
-                    </i>Hospitals
-                </a>
             </li>
         </ul>
     </div>
@@ -99,8 +86,8 @@
                 <div class="page-title-icon">
                     <i class="fa fa-file-text icon-gradient bg-amy-crisp"> </i>
                 </div>
-                <div>Consultancy
-                    <div class="page-title-subheading">Chat With Doctors
+                <div>Recommendation
+                    <div class="page-title-subheading">Sent From Doctors
                     </div>
                 </div>
             </div>
@@ -109,18 +96,12 @@
     <div class="row" onload="ajax();">
         <div class="col-lg-4" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
             <div style="text-align: center;font-size: 18px;background-color: #ddd;border-radius: 4px;color: #5e5fa4;margin-bottom: 8px;">
-                <span>Users Chart</span>
+                <span>Personal Users</span>
             </div>
             <ul class="list-group">
                 {% for user in users %}
-                        <li class="list-group-item"><a href="/chatting/{{ user[0] }}"> {{user[4]}} </a>
-                            {% if user[10] != 0 %}
-                                <span style="height: 12px;width: 12px;background-color: #1fc124;border-radius: 6px;
-                                float: right;margin-top: 5px;"></span>
-                            {% else %}
-                                <span style="height: 12px;width: 12px;background-color: #8a8a8a;border-radius: 6px;
-                                float: right;margin-top: 5px;"></span>
-                            {% endif %}
+                        <li class="list-group-item"><a href="/recommending/{{ user[0] }}"> {{user[4]}} </a>
+                            
                         </li>
                    
                 {% endfor %}
@@ -130,8 +111,8 @@
 
             {% if session['lid'] %}
                     <div style="text-align: center;">
-                        <h1>Welcome to Chat Room</h1>
-                        <p class="lead">Select users and start chat...</p>
+                        <h1>Welcome to Recommendation Room</h1>
+                        <p class="lead">Select doctors and see Recommendations...</p>
                     </div>
             {% endif %}
 

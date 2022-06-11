@@ -6,31 +6,31 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('doc_dash') }}" class="mm-active">
+                <a href="{{ url_for('doc_dash') }}" >
                     <i class="metismenu-icon fa fa-home"></i> Home
                 </a>
             </li>
             <li>
-                <a href="#">
-                    <i class="metismenu-icon fa fa-home"></i> View Sensor Data
+                <a href="/docsensorh/{{ session['id'] }}">
+                    <i class="metismenu-icon fa fa-binoculars"></i> View Sensor Data
                 </a>
             </li>
 
             <li>
-                <a href="#">
-                    <i class="metismenu-icon fa fa-user">
+                <a href="/docrecommendingh/{{ session['id'] }}" class="mm-active">
+                    <i class="metismenu-icon fa fa-assistive-listening-systems">
                     </i>Send Recommendation
                 </a>
             </li>
             <li>
                 <a href="/docchattingh/{{ session['id'] }}">
-                    <i class="metismenu-icon fa fa-plus-circle">
-                    </i>Consultion
+                    <i class="metismenu-icon fa fa-commenting-o">
+                    </i>Consultancy
                 </a>
             </li>
             <li>
                 <a href="{{ url_for('curappointment') }}">
-                    <i class="metismenu-icon fa fa-plus-circle">
+                    <i class="metismenu-icon fa fa-calendar-check-o">
                     </i>Appointment
                 </a>
             </li>
@@ -62,8 +62,8 @@
                 <div class="page-title-icon">
                     <i class="fa fa-file-text icon-gradient bg-amy-crisp"> </i>
                 </div>
-                <div>Consultancy
-                    <div class="page-title-subheading">Chat With Personal Users
+                <div>Recommendation
+                    <div class="page-title-subheading">Recommend Personal Users
                     </div>
                 </div>
             </div>
@@ -72,20 +72,19 @@
     <div class="row" onload="ajax();">
         <div class="col-lg-4" style="background-color: #f5f5f5;margin: 0px 10px;border-radius: 4px; padding: 10px 20px 20px 20px;">
             <div style="text-align: center;font-size: 18px;background-color: #ddd;border-radius: 4px;color: #5e5fa4;margin-bottom: 8px;">
-                <span>Users Chart</span>
+                <span>Personal Users</span>
             </div>
             <ul class="list-group">
                 {% for user in users %}
-                        <li class="list-group-item"><a href="/docchatting/{{ user[0] }}"> {{user[4]}} </a>
-                            {% if user[9] != 0 %}
-                                <span style="height: 12px;width: 12px;background-color: #1fc124;border-radius: 6px;
-                                float: right;margin-top: 5px;"></span>
-                            {% else %}
-                                <span style="height: 12px;width: 12px;background-color: #8a8a8a;border-radius: 6px;
-                                float: right;margin-top: 5px;"></span>
-                            {% endif %}
-                        </li>
                     
+                    {% for mes in person %}
+                        {% if user[5]==mes %}
+                        <li class="list-group-item"><a href="/docrecommending/{{ user[0] }}"> {{user[5]}} </a>
+                                
+                            </li>
+                            
+                        {% endif %}
+                    {% endfor %}
                 {% endfor %}
             </ul>
         </div>

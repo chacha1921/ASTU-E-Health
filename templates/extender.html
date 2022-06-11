@@ -49,20 +49,21 @@
                                     <a class="nav-link" href="{{ url_for('index') }}" style="font-size:20px;">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#" style="font-size:20px;">Developers</a>
+                                    <a class="nav-link" href="#Services" style="font-size:20px;">Our Services</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url_for('doclogin') }}" style="font-size:20px;">Doctors</a>
+                                    <a class="nav-link" href="#Departments" style="font-size:20px;">Our Department</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url_for('login')}}" style="font-size:20px;">Personal User</a>
+                                    <a class="nav-link" href="#contact" style="font-size:20px;">Contact Us</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url_for('adminlogin')}}" style="font-size:20px;">Admin</a>
+                                    <a class="nav-link" href="#login" style="font-size:20px;">Login</a>
                                 </li>
+                                
                             </ul>
                         </div>
-                        <!--<a class="nav-link badge-primary" style="font-size: 20px;" href="{{url_for('login')}}">Diagnose</a>-->
+                        
                     </nav>
                 </div>
             </div>
@@ -75,6 +76,7 @@
     {% endblock %}
     
     <!-- footer part start-->
+    <section id="login">
     <footer class="footer-area">
         <div class="footer section_padding">
             <div class="container">
@@ -86,7 +88,7 @@
                     <div class="col-xl-2 col-sm-6 col-md-4 single-footer-widget">
                         <h4>Patients</h4>
                         <ul>
-                            <li><a href="{{ url_for('login') }}">Login</a></li>
+                            <li><a href="{{url_for('login')}}">Login</a></li>
                             <li><a href="{{ url_for('register') }}">Register</a></li>
                         </ul>
                     </div>
@@ -94,13 +96,12 @@
                         <h4>Doctors</h4>
                         <ul>
                             <li><a href="{{ url_for('doclogin') }}">Login</a></li>
-                            <li><a href="{{ url_for('docregister') }}">Register</a></li>
                         </ul>
                     </div>
-                    <div class="col-xl-2 col-sm-6 col-md-6 single-footer-widget">
-                        <h4>Developers</h4>
+                    <div class="col-xl-2 col-sm-6 col-md-4 single-footer-widget">
+                        <h4>Admin</h4>
                         <ul>
-                            <li><a href="#">ASTU E-Health API</a></li>
+                            <li><a href="{{url_for('adminlogin')}}">Login</a></li>
                         </ul>
                     </div>
                     <div class="col-xl-3 col-sm-6 col-md-6 single-footer-widget">
@@ -126,6 +127,7 @@
                 </div>
             </div>
         </div>
+    </section>
 
         <div class="copyright_part">
             <div class="container">

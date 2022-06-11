@@ -6,7 +6,7 @@
         <ul class="vertical-nav-menu">
             <li class="app-sidebar__heading">Dashboard</li>
             <li>
-                <a href="{{ url_for('home') }}" class="mm-active">
+                <a href="{{ url_for('home') }}">
                     <i class="metismenu-icon fa fa-home"></i>
                     Home
                 </a>
@@ -24,22 +24,15 @@
                     </i>Diagnose(Symptoms)
                 </a>
             </li>
-            
             <li>
-                <a href="{{ url_for('diagnosedetails') }}">
-                    <i class="metismenu-icon fa fa-plus-square">
-                    </i>Diagnose(Text)
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('healthstatus') }}">
+                <a href="{{ url_for('healthstatus') }}"  class="mm-active">
                     <i class="metismenu-icon fa fa-hospital-o"></i>
                     Health Status
                 </a>
             </li>
             
             <li>
-                <a href="#">
+                <a href="/recommendingh/{{ session['id'] }}">
                     <i class="metismenu-icon fa fa-assistive-listening-systems">
                     </i>View Recommendation
                 </a>
@@ -64,12 +57,6 @@
                         <a href="{{ url_for('appointments') }}" tabindex="0" class="dropdown-item">Current Appointment</a>
                     </div>
                 </div>
-            </li>
-             <li>
-                <a href="{{ url_for('hospitals') }}">
-                    <i class="metismenu-icon fa fa-rocket">
-                    </i>Hospitals
-                </a>
             </li>
         </ul>
     </div>
@@ -99,9 +86,23 @@
                            <br>
                            <br>
                            <center>
-                            <iframe width="550" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/364841/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=4000&type=line"></iframe>
-                            <iframe width="550" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/693354/widgets/48780"></iframe>   
-                            <iframe width="550" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1580288/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Pulse&type=line"></iframe>
+                            <div class="row">
+                                <div class="col-lg-4">
+                               <p>Temperature value</p> 
+                                          
+                               <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/{{channel}}/widgets/{{temp}}"></iframe>
+    
+                        </div>
+                                <div class="col-lg-4">
+                                    <p>Humidity value</p>
+                            <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/{{channel}}/widgets/{{hum}}"></iframe>
+                                </div>
+                                <div class="col-lg-4">
+                            <p>Pulse Rate</p>
+                            <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/{{channel}}/widgets/{{puls}}"></iframe>
+
+                                </div>
+
                            </center>
                            <br>
                            <br>
@@ -113,21 +114,18 @@
                               <h3>Your Temperature and Humidity.</h3>
                               <br>
                               <br>
-                              <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/363294/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>       
-                        <iframe width="530" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/955051/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=600&timescale=60&title=Temperature%28Celsius%29+Vs.+Time&type=line&yaxismax=50&yaxismin=0"></iframe>
-                        <iframe width="530" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/84008/charts/2?days=1&dynamic=true&median=240&results=1440&title=Humidity&type=spline&xaxis=Time&yaxis=Humidity&yaxismin=20"></iframe>
-                        <iframe width="530" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/955051/widgets/136430"></iframe>     
+                              <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/{{channel}}/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperature&type=line"></iframe>
+       
+                              <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/{{channel}}/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Humidity&type=line"></iframe>
+
+                              <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/{{channel}}/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Pulse&type=line"></iframe>
+
+                       
                         </center>
                         </div>
                         </center>
                         <br>
-                        
-
-
-                        
-                        
                     </div>
-                    
                 </div>
             </div>
         </div>                
